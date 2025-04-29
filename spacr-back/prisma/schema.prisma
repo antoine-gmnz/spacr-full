@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Rover {
+    id              String      @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    landing_date    DateTime
+    launch_date     DateTime
+    status          String
+    max_sol         Int
+    max_date        DateTime
+}
+
+model Photo {
+    id              String      @id @default(auto()) @map("_id") @db.ObjectId
+    sol             Int
+    camera          String
+    img_src         String      @unique
+    roverId         String      @db.ObjectId
+}
+
+model JWSTImages {
+    id              String      @id @default(auto()) @map("_id") @db.ObjectId
+    img_src         String      
+    title           String
+}
