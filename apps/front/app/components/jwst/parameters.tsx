@@ -3,11 +3,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import type { PaginatedResponse } from "@/types/pagination";
-import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
+import { type Dispatch, type SetStateAction, useState, useEffect, type JSX } from "react";
 import useDebounce from "@/hooks/useDebounce";
+import type { JWSTImage } from "@/types/jwst";
 
 interface ParametersProps {
-  data: PaginatedResponse<JWSTImages[]> | undefined;
+  data: PaginatedResponse<JWSTImage[]> | undefined;
   currentPage: number;
   setLimit: Dispatch<SetStateAction<number>>;
   limit: number;
@@ -45,7 +46,8 @@ export function Parameters({
             <Label htmlFor="search">Search by title</Label>
             <Input
               type="text"
-              name="search"
+            name="search"
+            className="mt-2"
               value={search}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Type something here"

@@ -1,4 +1,10 @@
 /** @type {import("prettier").Config} */
 module.exports = {
-  ...require('@repo/eslint-config/prettier-base'),
+  semi: true,
+  singleQuote: true,
+  tabWidth: 2,
+  trailingComma: 'es5',
+  printWidth: 180,
+  bracketSpacing: true,
+  arrowParens: 'avoid',
 };

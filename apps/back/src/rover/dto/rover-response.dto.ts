@@ -16,10 +16,11 @@ export class RoverDto {
 export class MarsRoverPhotoDto {
   id: number;
   sol: number;
-  camera: RoverCameraDto;
+  camera: string;
   img_src: string;
   earth_date: string;
   rover: RoverDto;
+  credits: string;
 }
 
 export class MarsRoverResponseDto {

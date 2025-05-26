@@ -1,14 +1,26 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { MarsRoverResponseDto } from './dto/rover-response.dto';
+import { PaginatedResponse } from 'src/shared/types/paginated-response';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+import { Prisma } from '@prisma/client';
+import {
+  MarsRoverResponseDto,
+  MarsRoverPhotoDto,
+  RoverDto,
+} from './dto/rover-response.dto';
 
 @Injectable()
 export class RoverService {
+  private readonly logger = new Logger(RoverService.name);
+  constructor(private prismaService: PrismaService) {}
+
   async getRoverImages(
     rover: string,
     camera: string,
     beginSol: string,
     endSol: string,
-  ): Promise<MarsRoverResponseDto> {
+    page: string = '1',
+    limit: string = '10',
+  ): Promise<PaginatedResponse<MarsRoverResponseDto>> {
     try {
       // Validate inputs
       if (!rover) {
@@ -17,6 +29,11 @@ export class RoverService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
+      // Convert pagination parameters
+      const pageNumber = parseInt(page) || 1;
+      const limitNumber = parseInt(limit) || 10;
+      const skip = (pageNumber - 1) * limitNumber;
 
       // Convert the sol range
       const beginSolNumber = beginSol ? parseInt(beginSol) : null;
@@ -32,39 +49,85 @@ export class RoverService {
         }
       }
 
-      const params = new URLSearchParams();
-      if (!process.env.NASA_API_KEY) {
+      if (!beginSolNumber || !endSolNumber) {
         throw new HttpException(
-          'NASA API key is not set',
-          HttpStatus.INTERNAL_SERVER_ERROR,
+          'Both begin sol and end sol are required',
+          HttpStatus.BAD_REQUEST,
         );
       }
-      params.append('api_key', process.env.NASA_API_KEY);
 
+      // Build query filters
+      const whereClause: Prisma.RoverImageWhereInput = {
+        Rover: {
+          name: {
+            equals: rover,
+            mode: 'insensitive',
+          },
+        },
+        sol: {
+          gte: beginSolNumber,
+          lte: endSolNumber,
+        },
+      };
+
+      // Add camera filter if provided
       if (camera) {
-        params.append('camera', camera);
+        whereClause.camera = {
+          equals: camera,
+          mode: 'insensitive',
+        };
       }
 
-      if (beginSolNumber !== null) {
-        params.append('sol', beginSolNumber.toString());
-      }
+      // Fetch rover images with pagination
+      const [roverImages, totalCount] = await Promise.all([
+        this.prismaService.roverImage.findMany({
+          where: whereClause,
+          include: {
+            Rover: true,
+          },
+          skip: skip,
+          take: limitNumber,
+          orderBy: {
+            sol: 'asc',
+          },
+        }),
+        this.prismaService.roverImage.count({
+          where: whereClause,
+        }),
+      ]);
 
-      // We're using the begin_sol for the API call since the NASA API doesn't support
-      // a sol range. For a production app, we would need to make multiple calls
-      // and aggregate the results for a real range.
+      // Map database results to DTO format
+      const photos: MarsRoverPhotoDto[] = roverImages.map((image) => ({
+        id: image.id,
+        sol: image.sol,
+        camera: image.camera,
+        img_src: image.img_src,
+        credits: image.credits,
+        earth_date: this.calculateEarthDate(
+          image.Rover.landing_date,
+          image.sol,
+        ),
+        rover: {
+          id: image.Rover.id,
+          name: image.Rover.name,
+          landing_date: image.Rover.landing_date.toISOString().split('T')[0],
+          launch_date: image.Rover.launch_date.toISOString().split('T')[0],
+          status: image.Rover.status,
+        } as RoverDto,
+      }));
 
-      const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?${params.toString()}`;
+      const response: PaginatedResponse<MarsRoverResponseDto> = {
+        data: { photos: photos },
+        totalCount: totalCount,
+        totalPages: Math.ceil(totalCount / limitNumber),
+        currentPage: pageNumber,
+        hasNextPage: pageNumber * limitNumber < totalCount,
+        hasPrevPage: pageNumber > 1,
+        nextPage: pageNumber * limitNumber < totalCount ? pageNumber + 1 : null,
+        prevPage: pageNumber > 1 ? pageNumber - 1 : null,
+      };
 
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new HttpException(
-          `NASA API responded with status: ${response.status}`,
-          HttpStatus.BAD_GATEWAY,
-        );
-      }
-
-      return (await response.json()) as MarsRoverResponseDto;
+      return response;
     } catch (error) {
       console.error('Error fetching rover images:', error);
 
@@ -78,5 +141,28 @@ export class RoverService {
         error,
       );
     }
+  }
+
+  private getCameraFullName(camera: string): string {
+    const cameraMap: { [key: string]: string } = {
+      FHAZ: 'Front Hazard Avoidance Camera',
+      RHAZ: 'Rear Hazard Avoidance Camera',
+      MAST: 'Mast Camera',
+      CHEMCAM: 'Chemistry and Camera Complex',
+      MAHLI: 'Mars Hand Lens Imager',
+      MARDI: 'Mars Descent Imager',
+      NAVCAM: 'Navigation Camera',
+      PANCAM: 'Panoramic Camera',
+      MINITES: 'Miniature Thermal Emission Spectrometer (Mini-TES)',
+    };
+
+    return cameraMap[camera.toUpperCase()] || camera;
+  }
+
+  private calculateEarthDate(landingDate: Date, sol: number): string {
+    // Mars sol is approximately 24 hours, 39 minutes, and 35 seconds
+    const solInMilliseconds = 24 * 60 * 60 * 1000 + 39 * 60 * 1000 + 35 * 1000;
+    const earthDate = new Date(landingDate.getTime() + sol * solInMilliseconds);
+    return earthDate.toISOString().split('T')[0];
   }
 }

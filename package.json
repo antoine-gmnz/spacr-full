@@ -6,24 +6,27 @@
     "author": "",
     "license": "UNLICENSED",
     "scripts": {
-      "dev": "turbo run dev",
-      "build": "turbo run build",
-      "test": "turbo run test",
-      "test:e2e": "turbo run test:e2e",
-      "lint": "turbo run lint",
-      "format": "prettier --write \"**/*.{ts,tsx,md}\""
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "test": "turbo run test",
+        "test:e2e": "turbo run test:e2e",
+        "lint": "turbo run lint",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "devDependencies": {
-      "prettier": "^3.2.5",
-      "turbo": "^2.4.4"
+        "prettier": "^3.2.5",
+        "turbo": "^2.4.4"
     },
     "engines": {
-      "node": ">=18"
+        "node": ">=18"
     },
     "packageManager": "npm@10.9.0",
     "workspaces": [
-      "apps/*",
-      "packages/*"
-    ]
-  }
-  
+        "apps/*",
+        "packages/*"
+    ],
+    "dependencies": {
+        "@nestjs/schedule": "^6.0.0",
+        "puppeteer": "^24.9.0"
+    }
+}

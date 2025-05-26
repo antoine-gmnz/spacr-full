@@ -1,229 +1,90 @@
-/* eslint-disable react/no-children-prop */
+import { useState, type JSX } from 'react';
 
-import React, { useState, type JSX } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useForm } from "@tanstack/react-form";
-import { Button } from "@/components/ui/button";
-
-import { useQuery } from "@tanstack/react-query";
-import { DatePicker } from "@/components/ui/date-picker";
-import { convertEarthDateToMarsSol } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-
-import { Spinner } from "@radix-ui/themes";
-import { useRoverImageContext } from "@/context/roverImageContext";
-import { 
-  type MarsRoverPhotosCameraNamesAbv,
-  MappingRoverNamesAndCameras,
-  type RoverManifest,
-  type MarsRoverResponse,
-  MarsRoverManifest,
-} from "@/types/rover";
-
-const rovers = ["Curiosity", "Opportunity", "Spirit"];
+import { useQuery } from '@tanstack/react-query';
+import { ImageGallery } from '@/components/marsImages/imageGallery';
+import { PaginationWrapper } from '@/components/paginationWrapper';
+import { MarsParameters } from '@/components/marsImages/marsParameters';
+import type { PaginatedResponse } from '@/types/pagination';
+import type { MarsRoverResponse } from '@/types/rover';
+import { Separator } from '@/components/ui/separator';
+import { Loader } from '@/components/ui/loader';
 
 export default function MarsImages(): JSX.Element {
-  const { setImages } = useRoverImageContext();
-
-  const [cameras, setCameras] = useState<MarsRoverPhotosCameraNamesAbv[]>([]);
-  const [roverManifest, setRoverManifest] = useState<
-    undefined | Omit<RoverManifest, "cameras">
-  >(undefined);
-
-  const form = useForm({
-    onSubmit: async () => {
-      // Do something with form data
-      await refetch();
-    },
-    defaultValues: {
-      rover: "",
-      camera: "",
-      begin_sol: "",
-      end_sol: "",
-    },
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(20);
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
+  const [parameters, setParameters] = useState<{
+    rover: string;
+    camera: string;
+    begin_sol: string;
+    end_sol: string;
+  }>({
+    rover: '',
+    camera: '',
+    begin_sol: '',
+    end_sol: '',
   });
 
-  const { refetch } = useQuery({
-    enabled: false,
-    queryKey: ["fetchImages"],
+  const { data, isLoading } = useQuery({
+    enabled: !!parameters.rover && !!parameters.begin_sol && !!parameters.end_sol,
+    queryKey: ['fetchImages', parameters, currentPage],
     queryFn: async () => {
-      const { rover, camera, begin_sol, end_sol } = form.state.values;
+      const { rover, camera, begin_sol, end_sol } = parameters;
       try {
         const res = await fetch(
-          `http://localhost:4200/rover?rover=${rover}&camera=${camera}&begin_sol=${begin_sol}&end_sol=${end_sol}`,
+          `${import.meta.env.VITE_API_URL}/rover?rover=${rover}&camera=${camera}&begin_sol=${begin_sol}&end_sol=${end_sol}&limit=${limit}&page=${currentPage}`,
           {
-            method: "GET",
+            method: 'GET',
           }
         );
-
-        setImages((await res.json()) as MarsRoverResponse[]);
+        const data = (await res.json()) as PaginatedResponse<MarsRoverResponse>;
+        if (!hasFetched) {
+          setHasFetched(true);
+        }
+        return data;
       } catch (e) {
         console.error(e);
       }
     },
   });
 
-  const handleRoverChange = (): void => {
-    const roverValue = form.getFieldValue("rover").toLowerCase();
-    if (!roverValue) setCameras([]);
-
-    setCameras(
-      MappingRoverNamesAndCameras[
-        roverValue as keyof typeof MappingRoverNamesAndCameras
-      ]
-    );
-    setRoverManifest(MarsRoverManifest[roverValue]);
-  };
-
   return (
-    <div className="w-full h-auto">
-      <form
-        className="flex flex-row gap-10 w-full h-auto items-end"
-        onChange={handleRoverChange}
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form
-            .handleSubmit()
-            .then(() => {
-              console.log("submitted");
-            })
-            .catch((e) => {
-              console.error(e);
-            });
-        }}
-      >
-        <form.Field
-          name="rover"
-          children={(field) => (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sol-to">Select rover :</Label>
-              <Select
-                value={field.state.value}
-                onValueChange={(e) => {
-                  field.handleChange(e);
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a rover" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Rovers</SelectLabel>
-                    {rovers.map((rover) => (
-                      <SelectItem
-                        key={rover}
-                        value={rover}
-                        className="hover:cursor-pointer"
-                      >
-                        {rover}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Mars rover images gallery</h1>
+      <p className="text-slate-500 mb-5">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Distinctio vitae vero quisquam officia deserunt! Perferendis, neque necessitatibus nam laboriosam obcaecati vel in
+        doloremque ratione iusto odio, dolore consequatur dolores alias.
+      </p>
+      <Separator className="w-100 my-10" />
+      <MarsParameters setParameters={setParameters} isLoading={isLoading} />
+      {!data?.data && (
+        <div className="my-10">
+          <Separator />
+          <div className="flex items-center justify-center h-100 flex-col">
+            {!hasFetched ? (
+              <p className="text-gray-500">Please select parameters to fetch Mars rover images.</p>
+            ) : (
+              <p className="text-gray-500">No images found for the selected parameters.</p>
+            )}
+          </div>
+        </div>
+      )}
+      {data?.data && <ImageGallery images={data.data.photos} />}
+      {!data && isLoading && (
+        <div className="w-full h-[200px] flex justify-center items-center">
+          <Loader />
+        </div>
+      )}
+      {data?.data && (
+        <PaginationWrapper
+          currentPage={data.currentPage}
+          totalPages={data.totalPages}
+          onPageChange={(page: number) => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setCurrentPage(page);
+          }}
         />
-        <form.Field
-          name="camera"
-          children={(field) => (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sol-to">Select camera :</Label>
-              <Select
-                value={field.state.value}
-                disabled={cameras.length <= 0}
-                onValueChange={(e) => {
-                  field.handleChange(e);
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a camera" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Cameras :</SelectLabel>
-                    {cameras.map((camera) => (
-                      <SelectItem
-                        key={camera}
-                        value={camera}
-                        className="hover:cursor-pointer"
-                      >
-                        {camera}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-        />
-
-        <form.Field
-          name="begin_sol"
-          children={(field) => (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sol-to">From :</Label>
-              <DatePicker
-                disabled={form.getFieldValue("rover").length <= 0}
-                placeholder="Pick a date"
-                fromDate={roverManifest?.landing_date}
-                toDate={roverManifest?.max_date}
-                onValueChange={(e: Date) => {
-                  field.handleChange(
-                    convertEarthDateToMarsSol(
-                      form.getFieldValue("rover"),
-                      e
-                    ).toString()
-                  );
-                }}
-              />
-            </div>
-          )}
-        />
-        <form.Field
-          name="end_sol"
-          children={(field) => (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sol-to">To :</Label>
-              <DatePicker
-                disabled={form.getFieldValue("rover").length <= 0}
-                placeholder="Pick a date"
-                fromDate={roverManifest?.landing_date}
-                toDate={roverManifest?.max_date}
-                onValueChange={(e: Date) => {
-                  field.handleChange(
-                    convertEarthDateToMarsSol(
-                      form.getFieldValue("rover"),
-                      e
-                    ).toString()
-                  );
-                }}
-              />
-            </div>
-          )}
-        />
-        <form.Subscribe
-          selector={(formState) => [
-            formState.canSubmit,
-            formState.isSubmitting,
-          ]}
-        >
-          {([canSubmit, isSubmitting]) => (
-            <Button disabled={!canSubmit} type="submit">
-              {isSubmitting ? <Spinner size="3" /> : "Show images"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </form>
+      )}
     </div>
   );
 }

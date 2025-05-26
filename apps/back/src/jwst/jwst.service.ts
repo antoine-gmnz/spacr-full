@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JWSTImages, Prisma } from '@prisma/client';
+import { ESASpaceTelescopeImage, Prisma } from '@prisma/client';
+import { equal } from 'assert';
 import { PrismaService } from 'src/prisma.service';
 import { PaginatedResponse } from 'src/shared/types/paginated-response';
 
@@ -11,7 +12,7 @@ export class JwstService {
     page: number,
     limit: number,
     search: string | undefined,
-  ): Promise<PaginatedResponse<JWSTImages[]>> {
+  ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     try {
       const skip = (page - 1) * limit;
 
@@ -21,16 +22,23 @@ export class JwstService {
               contains: search,
               mode: Prisma.QueryMode.insensitive,
             },
+            type: {
+              equals: 'JAMES_WEBB',
+            },
           }
-        : undefined;
+        : {
+            type: {
+              equals: 'JAMES_WEBB',
+            },
+          };
 
       const [images, totalCount] = await Promise.all([
-        this.prismaService.jWSTImages.findMany({
+        this.prismaService.eSASpaceTelescopeImage.findMany({
           skip: skip,
           take: limit,
           where: where,
         }),
-        this.prismaService.jWSTImages.count({
+        this.prismaService.eSASpaceTelescopeImage.count({
           where: where,
         }),
       ]);
@@ -39,7 +47,7 @@ export class JwstService {
       const hasNextPage = page < totalPages;
       const hasPrevPage = page > 1;
 
-      const response: PaginatedResponse<JWSTImages[]> = {
+      const response: PaginatedResponse<ESASpaceTelescopeImage[]> = {
         data: images,
         totalCount: totalCount,
         totalPages: totalPages,
@@ -65,7 +73,7 @@ export class JwstService {
     page: number,
     limit: number,
     title: string,
-  ): Promise<PaginatedResponse<JWSTImages[]>> {
+  ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     try {
       const skip = (page - 1) * limit;
 
@@ -77,12 +85,12 @@ export class JwstService {
       };
 
       const [images, totalCount] = await Promise.all([
-        this.prismaService.jWSTImages.findMany({
+        this.prismaService.eSASpaceTelescopeImage.findMany({
           skip: skip,
           take: limit,
           where: where,
         }),
-        this.prismaService.jWSTImages.count({
+        this.prismaService.eSASpaceTelescopeImage.count({
           where: where,
         }),
       ]);
@@ -91,7 +99,7 @@ export class JwstService {
       const hasNextPage = page < totalPages;
       const hasPrevPage = page > 1;
 
-      const response: PaginatedResponse<JWSTImages[]> = {
+      const response: PaginatedResponse<ESASpaceTelescopeImage[]> = {
         data: images,
         totalCount: totalCount,
         totalPages: totalPages,

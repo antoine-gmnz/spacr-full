@@ -10,6 +10,8 @@ import { LaunchesModule } from './launches/launches.module';
 import { RoverModule } from './rover/rover.module';
 import { TleModule } from './tle/tle.module';
 import { AppLoggerMiddleware } from 'src/app-logger-middleware/app-logger-middleware.middleware';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScrapperModule } from './scrapper/scrapper.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { AppLoggerMiddleware } from 'src/app-logger-middleware/app-logger-middle
     LaunchesModule,
     RoverModule,
     TleModule,
+    ScheduleModule.forRoot(),
+    ScrapperModule,
   ],
   controllers: [AppController, ApodController],
   providers: [AppService, ApodService, PrismaService],

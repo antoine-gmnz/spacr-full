@@ -31,9 +31,9 @@ export function Apod(): JSX.Element {
       <Card className="w-full">
         <CardTitle className="ml-6">Astronomy Picture of the Day</CardTitle>
         <CardContent className="mt-5">
-          <div className="w-full h-[250px] rounded-xl overflow-hidden relative mt-3">
+          <div className="w-full h-[250px] rounded-xl overflow-hidden relative mt-3 bg-gray-200">
             {data.media_type === "image" && (
-              <img alt={data.title} className="object-cover" src={data.url} />
+              <img alt={data.title} className="h-full w-full object-contain" src={data.url} />
             )}
             {data.media_type === "video" && (
               <ReactPlayer

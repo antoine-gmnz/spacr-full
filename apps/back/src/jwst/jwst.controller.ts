@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { JWSTImages } from '@prisma/client';
+import { ESASpaceTelescopeImage } from '@prisma/client';
 import { JwstService } from 'src/jwst/jwst.service';
 import { PaginatedResponse } from 'src/shared/types/paginated-response';
 
@@ -12,7 +12,7 @@ export class JwstController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('search') search?: string,
-  ): Promise<PaginatedResponse<JWSTImages[]>> {
+  ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     const pageNumber = isNaN(parseInt(page, 10)) ? 1 : parseInt(page, 10);
     const limitNumber = isNaN(parseInt(limit, 10)) ? 10 : parseInt(limit, 10);
 
@@ -24,7 +24,7 @@ export class JwstController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('title') title?: string,
-  ): Promise<PaginatedResponse<JWSTImages[]>> {
+  ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     const pageNumber = isNaN(parseInt(page, 10)) ? 1 : parseInt(page, 10);
     const limitNumber = isNaN(parseInt(limit, 10)) ? 10 : parseInt(limit, 10);
 

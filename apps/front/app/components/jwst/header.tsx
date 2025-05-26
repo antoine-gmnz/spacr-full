@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 export function Header(): JSX.Element {
   return (
     <div className="w-full h-auto">

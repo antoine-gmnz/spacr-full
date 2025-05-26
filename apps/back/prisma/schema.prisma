@@ -10,30 +10,41 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model Rover {
-    id              String      @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
+    id              Int      @id @default(autoincrement())
+    name            String   @db.VarChar(255)
     landing_date    DateTime
     launch_date     DateTime
-    status          String
+    status          String   @db.VarChar(255)
     max_sol         Int
     max_date        DateTime
+    images          RoverImage[]
 }
 
-model Photo {
-    id              String      @id @default(auto()) @map("_id") @db.ObjectId
+model ESASpaceTelescopeImage {
+    id              Int       @id @default(autoincrement())
+    img_src         String    
+    esa_id          String    @unique
+    img_full_size   String    
+    title           String    
+    credits         String    
+    constellation   String    @db.VarChar(255)
+    fov             String    @db.VarChar(255)
+    release_date    String    @db.VarChar(255)
+    type            String    @db.VarChar(255)
+}
+
+model RoverImage {
+    id              Int      @id @default(autoincrement())
     sol             Int
-    camera          String
-    img_src         String      @unique
-    roverId         String      @db.ObjectId
-}
-
-model JWSTImages {
-    id              String      @id @default(auto()) @map("_id") @db.ObjectId
-    img_src         String      
-    title           String
+    camera          String   @db.VarChar(255)
+    img_src         String   @unique
+    roverId         Int      
+    Rover           Rover    @relation(fields: [roverId], references: [id])
+    title           String   @db.VarChar(255)
+    credits         String   @db.VarChar(255)
 }
