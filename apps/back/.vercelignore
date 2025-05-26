@@ -1,0 +1,23 @@
+# Exclude test files
+/test
+*.spec.ts
+
+# Development configs
+.eslintrc.js
+.prettierrc
+
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+
+# Dependency directories
+node_modules
+
+# Source maps
+*.map
+
+# TypeScript build info
+*.tsbuildinfo
