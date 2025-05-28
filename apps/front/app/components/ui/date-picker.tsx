@@ -35,7 +35,7 @@ function DatePicker({ placeholder, onValueChange, disabled = false, fromDate, to
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-0">
         <Calendar
-          className="border bg-white"
+          className="border bg-white dark:bg-accent"
           defaultMonth={date || new Date()}
           fromDate={fromDate ? new Date(fromDate) : undefined}
           initialFocus

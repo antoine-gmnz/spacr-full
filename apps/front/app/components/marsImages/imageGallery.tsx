@@ -16,12 +16,12 @@ export function ImageGallery({ images }: Props): JSX.Element {
         {images?.map(image => (
           <div className="rounded-xl relative" key={image.id}>
             <div className="absolute flex flex-row w-full top-2 left-2 gap-2">
-              <Badge className="">Sol : {image.sol}</Badge>
-              <Badge className="">{image.camera}</Badge>
+              <Badge className="font-mono">Sol : {image.sol}</Badge>
+              <Badge className="font-mono">{image.camera}</Badge>
             </div>
             <Image alt={image.img_src} objectFit="cover" className="h-[300px] w-full rounded-xl" src={image.img_src} />
             <div>
-              <Badge className="absolute bottom-2 right-2">Credits: {image.credits}</Badge>
+              <Badge className="absolute bottom-2 right-2 font-mono">Credits: {image.credits}</Badge>
             </div>
           </div>
         ))}

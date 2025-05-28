@@ -50,7 +50,7 @@ export default function MarsImages(): JSX.Element {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Mars rover images gallery</h1>
+      <h1 className="text-3xl font-bold font-mono mb-6 uppercase">Mars rover images gallery</h1>
       <p className="text-slate-500 mb-5">
         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Distinctio vitae vero quisquam officia deserunt! Perferendis, neque necessitatibus nam laboriosam obcaecati vel in
         doloremque ratione iusto odio, dolore consequatur dolores alias.
