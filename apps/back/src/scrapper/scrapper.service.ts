@@ -243,6 +243,8 @@ export abstract class ScrapperService {
       this.imageFullSizeSelector,
       'href',
     );
+
+    console.log(`Full URL: ${fullUrl} for ${url}`);
     const id = await this.extractText(page, this.imageEsaIdSelector);
     const credits = await this.extractText(page, this.creditsSelector);
     const fov = await this.extractText(page, this.fovSelector);
@@ -263,9 +265,10 @@ export abstract class ScrapperService {
     };
   }
 
-  private createImageUrl(endpoint: string): string {
+  private createImageUrl(url: string): string {
     const base_url = `https://cdn.${this.domain}.org/archives/images/large`;
-    return base_url + '/' + endpoint + '.jpg';
+    const imageId = url.split('/')[2];
+    return base_url + '/' + imageId + '.jpg';
   }
 
   abstract saveImageData(img_data: ImageData[]): Promise<void>;

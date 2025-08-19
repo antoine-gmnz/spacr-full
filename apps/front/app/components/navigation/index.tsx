@@ -34,10 +34,10 @@ export function Navigation(): JSX.Element {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link className={`${navigationMenuTriggerStyle()} [&.active]:font-bold`} href="/jwst">
+            <Link className={`${navigationMenuTriggerStyle()} [&.active]:font-bold`} href="/space-telescope-gallery">
               <div className="flex flex-row gap-1 items-center justify-center">
                 <SatelliteIcon size={17} />
-                <p>JWST Gallery</p>
+                <p>Space telescope Gallery</p>
               </div>
             </Link>
           </NavigationMenuItem>

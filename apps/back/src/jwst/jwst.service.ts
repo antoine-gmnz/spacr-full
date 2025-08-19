@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ESASpaceTelescopeImage, Prisma } from '@prisma/client';
-import { equal } from 'assert';
 import { PrismaService } from 'src/prisma.service';
 import { PaginatedResponse } from 'src/shared/types/paginated-response';
 
@@ -12,6 +11,7 @@ export class JwstService {
     page: number,
     limit: number,
     search: string | undefined,
+    telescope?: string,
   ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     try {
       const skip = (page - 1) * limit;
@@ -22,15 +22,15 @@ export class JwstService {
               contains: search,
               mode: Prisma.QueryMode.insensitive,
             },
-            type: {
-              equals: 'JAMES_WEBB',
-            },
           }
-        : {
-            type: {
-              equals: 'JAMES_WEBB',
-            },
-          };
+        : {};
+
+      if (telescope) {
+        where['type'] = {
+          equals: telescope,
+          mode: Prisma.QueryMode.insensitive,
+        };
+      }
 
       const [images, totalCount] = await Promise.all([
         this.prismaService.eSASpaceTelescopeImage.findMany({

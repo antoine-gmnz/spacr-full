@@ -1,13 +1,6 @@
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { JSX } from "react";
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { JSX } from 'react';
 
 interface ResultsPerPageProps {
   items: KeyValuePair[];
@@ -21,17 +14,12 @@ interface KeyValuePair {
   value: string;
 }
 
-export function ResultsPerPage({
-  items,
-  label,
-  placeholder,
-  handleChange,
-}: ResultsPerPageProps): JSX.Element {
+export function SelectWrapper({ items, label, placeholder, handleChange }: ResultsPerPageProps): JSX.Element {
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor="sol-to">{label}</Label>
       <Select
-        onValueChange={(e) => {
+        onValueChange={e => {
           handleChange(e);
         }}
       >
@@ -40,13 +28,9 @@ export function ResultsPerPage({
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {items.map((item) => (
-              <SelectItem
-                key={item.key}
-                value={item.value}
-                className="hover:cursor-pointer"
-              >
-                {item.value}
+            {items.map(item => (
+              <SelectItem key={item.key} value={item.value === '' ? null! : item.value} className="hover:cursor-pointer">
+                {item.key}
               </SelectItem>
             ))}
           </SelectGroup>

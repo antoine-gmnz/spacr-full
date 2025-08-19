@@ -3,7 +3,7 @@ import { ESASpaceTelescopeImage } from '@prisma/client';
 import { JwstService } from 'src/jwst/jwst.service';
 import { PaginatedResponse } from 'src/shared/types/paginated-response';
 
-@Controller('jwst')
+@Controller('space-telescope-gallery')
 export class JwstController {
   constructor(private readonly jwstService: JwstService) {}
 
@@ -12,11 +12,17 @@ export class JwstController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('search') search?: string,
+    @Query('telescope') telescope?: string,
   ): Promise<PaginatedResponse<ESASpaceTelescopeImage[]>> {
     const pageNumber = isNaN(parseInt(page, 10)) ? 1 : parseInt(page, 10);
     const limitNumber = isNaN(parseInt(limit, 10)) ? 10 : parseInt(limit, 10);
 
-    return await this.jwstService.getImages(pageNumber, limitNumber, search);
+    return await this.jwstService.getImages(
+      pageNumber,
+      limitNumber,
+      search,
+      telescope,
+    );
   }
 
   @Get('search-by-title')

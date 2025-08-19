@@ -19,7 +19,9 @@ export function ImageGallery({ images }: Props): JSX.Element {
               <Badge className="font-mono">Sol : {image.sol}</Badge>
               <Badge className="font-mono">{image.camera}</Badge>
             </div>
-            <Image alt={image.img_src} objectFit="cover" className="h-[300px] w-full rounded-xl" src={image.img_src} />
+            <div className="h-[250px]">
+              <Image alt={image.img_src} objectFit="cover" className="w-full rounded-xl" src={image.img_src} />
+            </div>
             <div>
               <Badge className="absolute bottom-2 right-2 font-mono">Credits: {image.credits}</Badge>
             </div>

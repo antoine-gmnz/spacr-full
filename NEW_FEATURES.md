@@ -1,0 +1,14 @@
+- Live ISS tracking with current position and crew info
+- Upcoming launches countdown with notifications
+- Space weather alerts (solar flares, geomagnetic storms)
+- Live satellite passes over user's location
+- Real-time space debris tracking
+- Exoplanet discovery tracker with habitability scores
+- Space mission timeline with historical context
+- Space news aggregation from multiple sources
+- Space quote of the day from astronauts/scientists
+- Interactive charts of space statistics
+- Space timeline from Big Bang to present
+- Mission success rates visualization
+- Space budget comparisons between agencies
+- Space technology evolution timeline
