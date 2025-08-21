@@ -245,7 +245,7 @@ export default class DataOptimizationService {
     const roverCount = await OptimizedRoverImage.query().count('* as total')
     const esaCount = await OptimizedEsaImage.query().count('* as total')
     
-    const totalImages = Number(roverCount[0].total) + Number(esaCount[0].total)
+    const totalImages = Number(roverCount[0]) + Number(esaCount[0])
     
     // Rough estimates based on average field sizes
     const oldAverageSize = 500 // bytes per record (with long URLs and text)

@@ -12,6 +12,8 @@ import router from '@adonisjs/core/services/router'
 const RoverImageController = () => import('#controllers/rover_image')
 const OptimizedImagesController = () => import('#controllers/optimized_images_controller')
 const ESAScrapingController = () => import('#controllers/esa_scraping_controller')
+const SpaceExplorerController = () => import('#controllers/space_explorer_controller')
+const ApodController = () => import('#controllers/apod_controller')
 
 router.get('/', async () => {
   return {
@@ -52,4 +54,10 @@ router.group(() => {
   router.post('/esa-scraping/trigger-update', [ESAScrapingController, 'triggerUpdate'])
   router.get('/esa-scraping/status', [ESAScrapingController, 'getScrapingStatus'])
   router.get('/esa-scraping/stats', [ESAScrapingController, 'getScrapingStats'])
+
+  // Space Explorer (3D) endpoints
+  router.get('/space-explorer/positions', [SpaceExplorerController, 'getPositions'])
+
+  // APOD endpoints
+  router.get('/apod', [ApodController, 'getApod'])
 }).prefix('/api/v1')

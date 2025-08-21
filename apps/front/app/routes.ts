@@ -7,4 +7,5 @@ export default [
   route('mars-rover', './routes/mars-rover.tsx'),
   route('launch-schedule', './routes/launch-schedule.tsx'),
   route('earth-view', './routes/earth-view.tsx'),
+  route('space-explorer', './routes/space-explorer.tsx'),
 ] satisfies RouteConfig;

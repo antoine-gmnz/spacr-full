@@ -29,7 +29,9 @@
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
     "#tests/*": "./tests/*.js",
-    "#config/*": "./config/*.js"
+    "#config/*": "./config/*.js",
+    "#lib/*": "./app/lib/*.js",
+    "#dto/*": "./app/dto/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",
@@ -57,6 +59,7 @@
     "@adonisjs/lucid": "^21.8.0",
     "@vinejs/vine": "^3.0.1",
     "adonisjs-jobs": "^0.0.26",
+    "astronomy-engine": "file:.yalc/astronomy-engine",
     "ioredis": "^5.7.0",
     "luxon": "^3.6.1",
     "pg": "^8.16.3",

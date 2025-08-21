@@ -18,7 +18,7 @@ export default function Home() {
           <Apod />
         </div>
         <div className="w-2/3">
-          <Schedule />
+          {/* <Schedule /> */}
         </div>
       </div>
     </div>
