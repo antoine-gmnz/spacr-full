@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { jwstApi, JwstImagesParams, JwstSearchParams } from '../api/jwst';
+import { jwstApi, type JwstImagesParams, type JwstSearchParams } from '../api/jwst';
 
 export function useJwstImages(params: JwstImagesParams = {}) {
   return useQuery({

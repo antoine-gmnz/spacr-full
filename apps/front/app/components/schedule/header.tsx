@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 
 export function Header(): JSX.Element {
   return (
@@ -15,12 +15,7 @@ export function Header(): JSX.Element {
       <div className="flex justify-between mt-5">
         <div className="text-sm text-slate-600 flex gap-1">
           <p>Credits :</p>
-          <a
-            href="https://thespacedevs.com/"
-            target="_blank"
-            className="underline hover:cursor-pointer"
-            rel="noreferrer"
-          >
+          <a href="https://thespacedevs.com/" target="_blank" className="underline hover:cursor-pointer" rel="noreferrer">
             The space devs
           </a>
         </div>

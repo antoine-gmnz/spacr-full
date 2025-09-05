@@ -5,20 +5,28 @@ export const optimizedImageValidator = vine.compile(
     page: vine.number().min(1).optional(),
     limit: vine.number().min(1).max(100).optional(),
     roverId: vine.number().optional(),
-    cameraCode: vine.string().maxLength(10).optional(),
-    solMin: vine.number().min(0).optional(),
-    solMax: vine.number().min(0).optional(),
-    type: vine.enum(['JWST', 'HUBBLE', 'OTHER']).optional(),
-    constellationCode: vine.string().maxLength(20).optional(),
-    releaseYear: vine.number().min(1990).max(2030).optional(),
-    yearMin: vine.number().min(1990).max(2030).optional(),
-    yearMax: vine.number().min(1990).max(2030).optional()
+    cameraCode: vine.string().maxLength(22).optional(),
+    rover: vine.string().maxLength(20).optional(),
+    camera: vine.string().maxLength(20).optional(),
+    begin_sol: vine.number().min(0).optional(),
+    end_sol: vine.number().min(0).optional(),
   })
 )
 
-export const searchValidator = vine.compile(
+export const esaImageSearchValidator = vine.compile(
   vine.object({
     search: vine.string().minLength(2).maxLength(100),
+    page: vine.number().min(1).optional(),
+    limit: vine.number().min(1).max(100).optional()
+  })
+)
+
+export const roverImageSearchValidator = vine.compile(
+  vine.object({
+    rover: vine.string(),
+    camera: vine.string().maxLength(22),
+    begin_sol: vine.number().min(0),
+    end_sol: vine.number().min(0),
     page: vine.number().min(1).optional(),
     limit: vine.number().min(1).max(100).optional()
   })

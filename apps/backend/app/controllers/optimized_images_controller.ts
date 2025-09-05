@@ -2,19 +2,20 @@ import { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import OptimizedImageService from '#services/optimized_image_service'
 import DataOptimizationService from '#services/data_optimization_service'
-import { optimizedImageValidator, searchValidator, statsValidator } from '#validators/optimized_image_validators'
+import { esaImageSearchValidator, optimizedImageValidator, roverImageSearchValidator } from '#validators/optimized_image_validators'
+import logger from '@adonisjs/core/services/logger'
 
 export default class OptimizedImagesController {
   @inject()
   async getRoverImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
     try {
-      const { page, limit, roverId, cameraCode, solMin, solMax } = await optimizedImageValidator.validate(request.all())
+      const { page, limit, roverId, cameraCode, begin_sol, end_sol } = await optimizedImageValidator.validate(request.all())
 
       const result = await imageService.getRoverImages(page, limit, {
         roverId,
         cameraCode,
-        solMin,
-        solMax
+        begin_sol,
+        end_sol
       })
 
       return response.json({
@@ -29,33 +30,7 @@ export default class OptimizedImagesController {
       })
     }
   }
-
-  @inject()
-  async getEsaImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
-    try {
-      const { page, limit, type, constellationCode, releaseYear, yearMin, yearMax } = await optimizedImageValidator.validate(request.all())
-
-      const result = await imageService.getEsaImages(page, limit, {
-        type,
-        constellationCode,
-        releaseYear,
-        yearMin,
-        yearMax
-      })
-
-      return response.json({
-        success: true,
-        data: result
-      })
-    } catch (error) {
-      return response.status(400).json({
-        success: false,
-        message: 'Invalid request parameters',
-        error: error.message
-      })
-    }
-  }
-
+  
   @inject()
   async getRoverImage({ params, response }: HttpContext, imageService: OptimizedImageService) {
     try {
@@ -95,9 +70,12 @@ export default class OptimizedImagesController {
   @inject()
   async searchRoverImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
     try {
-      const { search, page, limit } = await searchValidator.validate(request.all())
+      logger.error(request.all())
+      console.log('coucou')
+      const { rover, camera, begin_sol, end_sol, page, limit } = request.all()
 
-      const result = await imageService.searchRoverImages(search, page, limit)
+      console.log('coucou 2')
+      const result = await imageService.searchRoverImages(2, "NAVCAM", 1, 10, 1, 10)
 
       return response.json({
         success: true,
@@ -115,7 +93,7 @@ export default class OptimizedImagesController {
   @inject()
   async searchEsaImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
     try {
-      const { search, page, limit } = await searchValidator.validate(request.all())
+      const { search, page, limit } = await esaImageSearchValidator.validate(request.all())
 
       const result = await imageService.searchEsaImages(search, page, limit)
 

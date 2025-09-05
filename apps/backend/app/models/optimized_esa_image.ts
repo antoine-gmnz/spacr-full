@@ -2,14 +2,7 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Constellation from './constellation.js'
 import { DateTime } from 'luxon'
-
-interface EsaImageMetadata {
-  fullTitle?: string
-  credits?: string
-  releaseDate?: string
-  originalUrl?: string
-  fullSizeUrl?: string
-}
+import { createHash } from 'crypto'
 
 export type EsaImageType = 'JWST' | 'HUBBLE' | 'OTHER'
 
@@ -26,7 +19,7 @@ export default class OptimizedEsaImage extends BaseModel {
   declare imgHash: string
 
   @column()
-  declare titleShort: string
+  declare title: string
 
   @column()
   declare constellationCode: string | null
@@ -35,16 +28,13 @@ export default class OptimizedEsaImage extends BaseModel {
   declare fov: string | null
 
   @column()
-  declare releaseYear: number | null
+  declare releaseDate: string | null
+
+  @column()
+  declare credits: string | null
 
   @column()
   declare type: EsaImageType
-
-  @column({
-    prepare: (value: EsaImageMetadata) => JSON.stringify(value),
-    consume: (value: string) => value ? JSON.parse(value) : null
-  })
-  declare metadata: EsaImageMetadata | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -57,37 +47,20 @@ export default class OptimizedEsaImage extends BaseModel {
   })
   declare constellation: BelongsTo<typeof Constellation>
 
-  // Computed properties for easy access to metadata
-  get title(): string {
-    return this.metadata?.fullTitle || this.titleShort
-  }
-
-  get credits(): string {
-    return this.metadata?.credits || 'ESA/Webb, ESA/Hubble & NASA'
-  }
-
-  get releaseDate(): string | null {
-    return this.metadata?.releaseDate || null
-  }
-
-  get originalUrl(): string | null {
-    return this.metadata?.originalUrl || null
-  }
-
-  get fullSizeUrl(): string | null {
-    return this.metadata?.fullSizeUrl || null
-  }
-
   // Helper method to reconstruct image URLs from hash
   get imgSrc(): string {
-    return this.reconstructImageUrl(this.imgHash, this.type, false)
+    return OptimizedEsaImage.reconstructImageUrl(this.imgHash, this.type, false)
   }
 
   get imgFullSize(): string {
-    return this.reconstructImageUrl(this.imgHash, this.type, true)
+    return OptimizedEsaImage.reconstructImageUrl(this.imgHash, this.type, true)
   }
 
-  private reconstructImageUrl(hash: string, type: EsaImageType, fullSize: boolean = false): string {
+  static generateImageHash(url: string): string {
+    return createHash('md5').update(url).digest('hex')
+  }
+
+  static reconstructImageUrl(esaId: string, type: EsaImageType, fullSize: boolean = false): string {
     const baseUrls = {
       JWST: fullSize 
         ? 'https://cdn.esawebb.org/archives/images/publicationjpg'
@@ -103,7 +76,7 @@ export default class OptimizedEsaImage extends BaseModel {
     const baseUrl = baseUrls[type]
     
     // For ESA images, the URL pattern is typically: baseUrl/esaId.jpg
-    return `${baseUrl}/${this.esaId}.jpg`
+    return `${baseUrl}/${esaId}.jpg`
   }
 
   // Static method to create optimized record from original data
@@ -122,14 +95,6 @@ export default class OptimizedEsaImage extends BaseModel {
     const titleShort = originalData.title.substring(0, 100)
     const constellationCode = this.mapConstellationNameToCode(originalData.constellation)
     const releaseYear = this.extractYearFromDate(originalData.releaseDate)
-    
-    const metadata: EsaImageMetadata = {
-      fullTitle: originalData.title,
-      credits: originalData.credits,
-      releaseDate: originalData.releaseDate,
-      originalUrl: originalData.imgSrc,
-      fullSizeUrl: originalData.imgFullSize
-    }
 
     return await this.create({
       esaId: originalData.esaId,
@@ -139,14 +104,7 @@ export default class OptimizedEsaImage extends BaseModel {
       fov: originalData.fov?.substring(0, 20) || null,
       releaseYear,
       type: originalData.type,
-      metadata
     })
-  }
-
-  // Generate MD5 hash from URL for compact storage
-  private static generateImageHash(url: string): string {
-    const crypto = require('crypto')
-    return crypto.createHash('md5').update(url).digest('hex')
   }
 
   // Extract year from various date formats

@@ -1,13 +1,5 @@
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
-import type { JSX } from "react";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
+import type { JSX } from 'react';
 
 interface PaginationWrapperProps {
   currentPage: number;
@@ -15,11 +7,7 @@ interface PaginationWrapperProps {
   onPageChange: (page: number) => void;
 }
 
-export function PaginationWrapper({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationWrapperProps): JSX.Element {
+export function PaginationWrapper({ currentPage, totalPages, onPageChange }: PaginationWrapperProps): JSX.Element {
   const renderEllipsis = (key: string) => (
     <PaginationItem className="hover:cursor-pointer" key={key}>
       <PaginationEllipsis />
@@ -28,10 +16,7 @@ export function PaginationWrapper({
 
   const renderPageLink = (page: number) => (
     <PaginationItem className="hover:cursor-pointer" key={page}>
-      <PaginationLink
-        isActive={currentPage === page}
-        onClick={() => onPageChange(page)}
-      >
+      <PaginationLink isActive={currentPage === page} onClick={() => onPageChange(page)}>
         {page}
       </PaginationLink>
     </PaginationItem>
@@ -45,7 +30,7 @@ export function PaginationWrapper({
 
     // Show ellipsis if current page is greater than 3
     if (currentPage > 3) {
-      pageLinks.push(renderEllipsis("ellipsis-start"));
+      pageLinks.push(renderEllipsis('ellipsis-start'));
     }
 
     // Show the previous page if it's not the first page
@@ -65,7 +50,7 @@ export function PaginationWrapper({
 
     // Show ellipsis if current page is less than totalPages - 2
     if (currentPage < totalPages - 2) {
-      pageLinks.push(renderEllipsis("ellipsis-end"));
+      pageLinks.push(renderEllipsis('ellipsis-end'));
     }
 
     // Always show the last page

@@ -6,7 +6,10 @@ import { convertEarthDateToMarsSol } from '@/lib/utils';
 import { type MarsRoverPhotosCameraNamesAbv, MappingRoverNamesAndCameras, type RoverManifest, MarsRoverManifest } from '@/types/rover';
 import { Spinner } from '@radix-ui/themes';
 import { useForm } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
 import { useState, type JSX } from 'react';
+import type { GetRoversResponseDTO } from '@spacr/shared-types/dto';
+import { data } from 'react-router';
 
 interface ParametersProps {
   isLoading?: boolean;
@@ -20,11 +23,14 @@ interface ParametersProps {
   >;
 }
 
-const rovers = ['Perseverance', 'Curiosity', 'Opportunity', 'Spirit'];
-
 export function MarsParameters({ setParameters, isLoading }: ParametersProps): JSX.Element {
   const [cameras, setCameras] = useState<MarsRoverPhotosCameraNamesAbv[]>([]);
   const [roverManifest, setRoverManifest] = useState<undefined | Omit<RoverManifest, 'cameras'>>(undefined);
+
+  const { data: rovers } = useQuery<GetRoversResponseDTO[]>({
+    queryKey: ['rovers'],
+    queryFn: () => fetch(`${import.meta.env.VITE_API_URL}/rovers`).then(res => res.json()),
+  });
 
   const form = useForm({
     onSubmit: () => {
@@ -43,12 +49,20 @@ export function MarsParameters({ setParameters, isLoading }: ParametersProps): J
     },
   });
 
-  const handleRoverChange = (): void => {
-    const roverValue = form.getFieldValue('rover').toLowerCase();
-    if (!roverValue) setCameras([]);
+  const getRoverName = (roverId: number): string => {
+    const roverName = rovers?.find(rover => rover.id === Number(roverId))?.name;
+    if (!roverName) return '';
+    return roverName;
+  };
 
-    setCameras(MappingRoverNamesAndCameras[roverValue as keyof typeof MappingRoverNamesAndCameras]);
-    setRoverManifest(MarsRoverManifest[roverValue]);
+  const handleRoverChange = (): void => {
+    const selectedRoverId = form.getFieldValue('rover');
+    if (!selectedRoverId) setCameras([]);
+
+    const roverName = getRoverName(Number(selectedRoverId));
+
+    setCameras(MappingRoverNamesAndCameras[roverName.toLowerCase() as keyof typeof MappingRoverNamesAndCameras]);
+    setRoverManifest(MarsRoverManifest[roverName]);
   };
 
   return (
@@ -94,9 +108,9 @@ export function MarsParameters({ setParameters, isLoading }: ParametersProps): J
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Rovers</SelectLabel>
-                    {rovers.map(rover => (
-                      <SelectItem key={rover} value={rover} className="hover:cursor-pointer">
-                        {rover}
+                    {rovers?.map(rover => (
+                      <SelectItem key={rover.id} value={rover.id.toString()} className="hover:cursor-pointer">
+                        {rover.name}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -112,7 +126,7 @@ export function MarsParameters({ setParameters, isLoading }: ParametersProps): J
               <Label htmlFor="sol-to">Select camera :</Label>
               <Select
                 value={field.state.value}
-                disabled={cameras.length <= 0}
+                disabled={cameras?.length <= 0}
                 onValueChange={e => {
                   field.handleChange(e);
                 }}
@@ -146,7 +160,7 @@ export function MarsParameters({ setParameters, isLoading }: ParametersProps): J
                 fromDate={roverManifest?.landing_date}
                 toDate={roverManifest?.max_date}
                 onValueChange={(e: Date) => {
-                  field.handleChange(convertEarthDateToMarsSol(form.getFieldValue('rover'), e).toString());
+                  field.handleChange(convertEarthDateToMarsSol(getRoverName(Number(form.getFieldValue('rover'))), e).toString());
                 }}
               />
             </div>
@@ -163,7 +177,7 @@ export function MarsParameters({ setParameters, isLoading }: ParametersProps): J
                 fromDate={roverManifest?.landing_date}
                 toDate={roverManifest?.max_date}
                 onValueChange={(e: Date) => {
-                  field.handleChange(convertEarthDateToMarsSol(form.getFieldValue('rover'), e).toString());
+                  field.handleChange(convertEarthDateToMarsSol(getRoverName(Number(form.getFieldValue('rover'))), e).toString());
                 }}
               />
             </div>

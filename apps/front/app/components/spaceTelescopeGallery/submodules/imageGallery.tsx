@@ -14,7 +14,7 @@ interface ImageGalleryProps {
   image: SpaceTelescopeImage;
 }
 export function ImageGallery({ image }: ImageGalleryProps): JSX.Element {
-  const { img_src, img_full_size, title, type } = image;
+  const { metadata, title, type } = image;
   const [detailsOpen, setDetailsOpen] = useState(false);
   const getScreenSizeUrl = (url: string): string => {
     return url.replace('large', 'screen');
@@ -27,7 +27,7 @@ export function ImageGallery({ image }: ImageGalleryProps): JSX.Element {
           <Badge className="h-5">{type}</Badge>
         </div>
         <div className="h-10 absolute top-3 right-3 z-20 flex gap-1 flex-row">
-          <Badge onClick={() => window.open(img_full_size, '_blank')?.focus()} className="h-10 w-10 rounded-xl z-20 hover:cursor-pointer">
+          <Badge onClick={() => window.open(metadata.imgFullSize, '_blank')?.focus()} className="h-10 w-10 rounded-xl z-20 hover:cursor-pointer">
             <DownloadIcon />
           </Badge>
           <CollapsibleTrigger asChild>
@@ -47,7 +47,7 @@ export function ImageGallery({ image }: ImageGalleryProps): JSX.Element {
             </DialogContent>
           </Dialog>
         </div>
-        <Image src={getScreenSizeUrl(img_src)} alt={title} className="object-cover h-100 w-100" />
+        <Image src={getScreenSizeUrl(metadata.imgSrc)} alt={title} className="object-cover h-100 w-100" />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

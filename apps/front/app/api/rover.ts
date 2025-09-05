@@ -1,6 +1,6 @@
-import { MarsRoverResponse } from "../types/rover";
+import { MarsRoverResponse } from '../types/rover';
 
-const API_URL = "http://localhost:3000";
+const API_URL = 'http://localhost:3000';
 
 export interface RoverImagesParams {
   rover: string;
@@ -10,25 +10,20 @@ export interface RoverImagesParams {
 }
 
 export const roverApi = {
-  getRoverImages: async ({
-    rover,
-    camera,
-    beginSol,
-    endSol,
-  }: RoverImagesParams): Promise<MarsRoverResponse> => {
+  getRoverImages: async ({ rover, camera, beginSol, endSol }: RoverImagesParams): Promise<MarsRoverResponse> => {
     const params = new URLSearchParams();
-    params.append("rover", rover);
+    params.append('rover', rover);
 
     if (camera) {
-      params.append("camera", camera);
+      params.append('camera', camera);
     }
 
     if (beginSol) {
-      params.append("begin_sol", beginSol);
+      params.append('begin_sol', beginSol);
     }
 
     if (endSol) {
-      params.append("end_sol", endSol);
+      params.append('end_sol', endSol);
     }
 
     const response = await fetch(`${API_URL}/rover?${params.toString()}`);

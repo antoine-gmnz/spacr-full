@@ -1,12 +1,17 @@
 export interface SpaceTelescopeImage {
   id: number;
-  img_src: string;
-  esa_id: string;
-  img_full_size: string;
+  esaId: string;
+  imgHash: string;
   title: string;
-  credits: string;
-  constellation: string;
-  fov: string;
-  release_date: string;
+  constellationCode: string | null;
+  fov: string | null;
   type: string;
+  createdAt: string;
+  updatedAt: string;
+  credits: string;
+  releaseDate: string;
+  metadata: {
+    imgSrc: string;
+    imgFullSize: string;
+  };
 }

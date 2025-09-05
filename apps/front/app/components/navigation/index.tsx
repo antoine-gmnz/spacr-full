@@ -1,6 +1,6 @@
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, Link } from '@radix-ui/react-navigation-menu';
-import { HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, SunIcon } from 'lucide-react';
+import { EarthIcon, HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, SunIcon } from 'lucide-react';
 // import Image from "next/image";
 
 import LogoH from '@/assets/logo-hor.svg';
@@ -28,7 +28,7 @@ export function Navigation(): JSX.Element {
           <NavigationMenuItem>
             <Link className={`${navigationMenuTriggerStyle()} [&.active]:font-bold`} href="/mars-rover">
               <div className="flex flex-row gap-1 items-center justify-center">
-                <OrbitIcon size={17} />
+                <EarthIcon size={17} />
                 <p>Mars Rover images</p>
               </div>
             </Link>
@@ -46,6 +46,14 @@ export function Navigation(): JSX.Element {
               <div className="flex flex-row gap-1 items-center justify-center">
                 <RocketIcon size={17} />
                 <p>Launch schedule</p>
+              </div>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link className={`${navigationMenuTriggerStyle()} [&.active]:font-bold`} href="/space-explorer">
+              <div className="flex flex-row gap-1 items-center justify-center">
+                <OrbitIcon size={17} />
+                <p>Space Explorer</p>
               </div>
             </Link>
           </NavigationMenuItem>

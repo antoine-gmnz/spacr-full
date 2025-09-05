@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { roverApi, RoverImagesParams } from '../api/rover';
+import { roverApi, type RoverImagesParams } from '../api/rover';
 
 export function useRoverImages(params: RoverImagesParams) {
   return useQuery({

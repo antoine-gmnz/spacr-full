@@ -1,16 +1,8 @@
-import SelectWrapper from "@/components/selectWrapper";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import type { JSX } from "react";
+import SelectWrapper from '@/components/selectWrapper';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import type { JSX } from 'react';
 
 /**
  * Select :
@@ -47,11 +39,11 @@ export default function Filters(): JSX.Element {
       <SelectWrapper
         name="space-agency"
         label="Select a space agency"
-        placeholder={"Ex: NASA"}
-        selectGroupLabel={"Select one"}
+        placeholder={'Ex: NASA'}
+        selectGroupLabel={'Select one'}
         keyValueList={[
-          { key: "NASA", value: "nasa" },
-          { key: "ESA", value: "esa" },
+          { key: 'NASA', value: 'nasa' },
+          { key: 'ESA', value: 'esa' },
         ]}
       />
       <Separator className="w-full my-10" />

@@ -1,5 +1,5 @@
-import { Separator } from "@/components/ui/separator";
-import type { JSX } from "react";
+import { Separator } from '@/components/ui/separator';
+import type { JSX } from 'react';
 
 export function Footer(): JSX.Element {
   return (

@@ -1,6 +1,6 @@
-import { TleResponse } from "../types/tle";
+import { TleResponse } from '../types/tle';
 
-const API_URL = "http://localhost:3000";
+const API_URL = 'http://localhost:3000';
 
 export const tleApi = {
   getTleData: async (): Promise<TleResponse> => {

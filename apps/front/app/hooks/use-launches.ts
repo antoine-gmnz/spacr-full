@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { launchesApi, LaunchSearchParams } from '../api/launches';
+import { launchesApi, type LaunchSearchParams } from '../api/launches';
 
 export function useLaunches() {
   return useQuery({

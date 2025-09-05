@@ -1,27 +1,20 @@
-import { Vector3 } from "three";
-import * as satelliteJs from "satellite.js";
-import type { SatelliteVectorData } from "src/components/earthView/type";
-import { Member } from "src/shared-types/src/NASA";
+import { Vector3 } from 'three';
+import * as satelliteJs from 'satellite.js';
+import type { SatelliteVectorData } from 'src/components/earthView/type';
+import { Member } from 'src/shared-types/src/NASA';
 
-export const getSatRecFromMember = (
-  line1: string,
-  line2: string
-): satelliteJs.SatRec => {
+export const getSatRecFromMember = (line1: string, line2: string): satelliteJs.SatRec => {
   const tle = [line1, line2];
-  
-  return satelliteJs.twoline2satrec(tle[0] as string, tle[1] as string);
+
+  return satelliteJs.twoline2satrec(tle[0], tle[1]);
 };
 
-export const getPositionECI = (
-  satrec: satelliteJs.SatRec
-): boolean | satelliteJs.EciVec3<number> => {
+export const getPositionECI = (satrec: satelliteJs.SatRec): boolean | satelliteJs.EciVec3<number> => {
   const positionAndVelocity = satelliteJs.propagate(satrec, new Date());
   return positionAndVelocity.position;
 };
 
-export const calculateCartesianCoords = (
-  positionEci: satelliteJs.EciVec3<number>
-): { x: number; y: number; z: number } => {
+export const calculateCartesianCoords = (positionEci: satelliteJs.EciVec3<number>): { x: number; y: number; z: number } => {
   const gmst = satelliteJs.gstime(new Date());
   const positionGd = satelliteJs.eciToGeodetic(positionEci, gmst);
   const longitude = satelliteJs.degreesLong(positionGd.longitude);
@@ -40,37 +33,24 @@ export const calculateCartesianCoords = (
   return { x, y, z };
 };
 
-export const getVectorFromPositionECI = (
-  positionEci: satelliteJs.EciVec3<number>
-): Vector3 => {
+export const getVectorFromPositionECI = (positionEci: satelliteJs.EciVec3<number>): Vector3 => {
   const { x, y, z } = calculateCartesianCoords(positionEci);
   return new Vector3(x, y, z);
 };
 
-export const checkPositionECI = (
-  positionEci: satelliteJs.EciVec3<number> | boolean
-): boolean => {
-  if (
-    positionEci &&
-    typeof positionEci !== "boolean" &&
-    Object.values(positionEci).length > 0
-  )
-    return true;
+export const checkPositionECI = (positionEci: satelliteJs.EciVec3<number> | boolean): boolean => {
+  if (positionEci && typeof positionEci !== 'boolean' && Object.values(positionEci).length > 0) return true;
   return false;
 };
 
-export const getBaseDataFor3DView = (
-  satelliteData: Member[]
-): (SatelliteVectorData | undefined)[] => {
+export const getBaseDataFor3DView = (satelliteData: Member[]): (SatelliteVectorData | undefined)[] => {
   return satelliteData
-    .map((satellite) => {
+    .map(satellite => {
       const satrec = getSatRecFromMember(satellite.line1, satellite.line2);
       const positionEci = getPositionECI(satrec);
 
       if (checkPositionECI(positionEci)) {
-        const { x, y, z } = calculateCartesianCoords(
-          positionEci as satelliteJs.EciVec3<number>
-        );
+        const { x, y, z } = calculateCartesianCoords(positionEci as satelliteJs.EciVec3<number>);
 
         return {
           position: new Vector3(x, y, z),

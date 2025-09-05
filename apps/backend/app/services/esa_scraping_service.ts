@@ -22,12 +22,11 @@ export interface ESAScrapingConfig {
 
 export interface ScrapedImageData {
   esaId: string
-  imgSrc: string
-  imgFullSize?: string
   title: string
   credits?: string
   constellation?: string
   fov?: string
+  imgHash: string
   releaseDate?: string
   type: 'JWST' | 'HUBBLE' | 'OTHER'
 }
@@ -94,7 +93,7 @@ export default class ESAScrapingService {
       }
       
       // Batch save to optimized database
-      await this.batchSaveImages(allImages)
+      // await this.batchSaveImages(allImages)
       
       logger.info(`Initial ESA scraping completed: ${allImages.length} total images processed`)
       
@@ -162,9 +161,6 @@ export default class ESAScrapingService {
         await page.goto(config.baseUrl + 'page/' + i + config.parameters)
         const imageDataList = await this.scrapePage(page, config)
         fullImageDataList.push(...imageDataList)
-        
-        // Add delay to be respectful to the server
-        await new Promise(resolve => setTimeout(resolve, 1000))
       }
     } finally {
       await page.close()
@@ -240,19 +236,21 @@ export default class ESAScrapingService {
           `https://${config.domain}.org${imageUrl}`,
           config
         )
-        if (!imageDetails) continue
+        if (!imageDetails || !Object.values(imageDetails).every(value => value !== undefined)) continue
+        
 
-        imageDataList.push({
+        console.log(`Image details: ${JSON.stringify(imageDetails)}`)
+
+        await this.batchSaveImages([{
           esaId: imageDetails.id,
-          imgSrc: this.createImageUrl(imageUrl, config.domain),
-          imgFullSize: imageDetails.fullUrl,
+          imgHash: OptimizedEsaImage.generateImageHash(imageDetails.fullUrl || imageUrl),
           title: title,
           credits: imageDetails.credits,
           constellation: imageDetails.constellation,
           fov: imageDetails.fov,
           releaseDate: imageDetails.releaseDate,
           type: config.type,
-        })
+        }])
       } catch (error) {
         logger.error(`Error processing image ${i} on page for ${config.type}`, error)
         continue
@@ -365,8 +363,9 @@ export default class ESAScrapingService {
     
     for (const imageData of data) {
       try {
-        await OptimizedEsaImage.createFromOriginal(imageData)
+        await OptimizedEsaImage.create(imageData)
       } catch (error) {
+        logger.error(error)
         // Skip duplicates (esa_id is unique)
         if (error.code !== '23505') { // PostgreSQL unique constraint violation
           logger.error(`Error saving image ${imageData.esaId}`, error)
@@ -389,7 +388,7 @@ export default class ESAScrapingService {
       try {
         await OptimizedEsaImage.updateOrCreate(
           { esaId: imageData.esaId },
-          await OptimizedEsaImage.createFromOriginal(imageData)
+          await OptimizedEsaImage.create(imageData)
         )
       } catch (error) {
         logger.error(`Error updating image ${imageData.esaId}`, error)

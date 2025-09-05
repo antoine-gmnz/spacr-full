@@ -1,5 +1,5 @@
-import type { Vector3 } from "three";
-import type * as satelliteJs from "satellite.js";
+import type { Vector3 } from 'three';
+import type * as satelliteJs from 'satellite.js';
 
 export interface SatelliteVectorData {
   position: Vector3 | undefined;

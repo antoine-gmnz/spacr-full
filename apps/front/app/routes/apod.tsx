@@ -1,10 +1,7 @@
-import { Apod } from "@/components/apod/apod";
+import { Apod } from '@/components/apod/apod';
 
 export function meta() {
-  return [
-    { title: "APOD - Astronomy Picture of the Day" },
-    { name: "description", content: "NASA's Astronomy Picture of the Day" },
-  ];
+  return [{ title: 'APOD - Astronomy Picture of the Day' }, { name: 'description', content: "NASA's Astronomy Picture of the Day" }];
 }
 
 export default function ApodPage() {

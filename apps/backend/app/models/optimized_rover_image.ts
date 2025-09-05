@@ -32,7 +32,6 @@ export default class OptimizedRoverImage extends BaseModel {
 
   @column({
     prepare: (value: RoverImageMetadata) => JSON.stringify(value),
-    consume: (value: string) => value ? JSON.parse(value) : null
   })
   declare metadata: RoverImageMetadata | null
 

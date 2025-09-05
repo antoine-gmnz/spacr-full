@@ -1,7 +1,7 @@
-import ESASpaceTelescopeImage from "../models/ESASpaceTelescopeImage.js";
+import ESASpaceTelescopeImage from "../models/optimized_esa_image.js";
 
 export default class ESASpaceTelescopeImageService {
-    public async getImages(limit: number, page: number) {
+    public async getImages(page: number, limit: number) {
         return await ESASpaceTelescopeImage.query().orderBy('id', 'desc').paginate(page, limit)
     }
 
@@ -11,5 +11,9 @@ export default class ESASpaceTelescopeImageService {
 
     public async createImage(image: ESASpaceTelescopeImage) {
         return await ESASpaceTelescopeImage.create(image)
+    }
+
+    public async searchImages(search: string, page: number, limit: number) {
+        return (await ESASpaceTelescopeImage.query().where('title', 'ILIKE', `%${search}%`).paginate(page, limit))
     }
 }

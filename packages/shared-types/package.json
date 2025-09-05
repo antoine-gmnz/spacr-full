@@ -1,0 +1,11 @@
+{
+  "name": "@spacr/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "description": "",
+  "author": "Antoine Gimenez",
+  "license": "MIT",
+  "exports": {
+    "./dto": "./dto/index.ts"
+  }
+}

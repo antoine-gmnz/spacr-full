@@ -1,11 +1,24 @@
 import { Badge } from '@/components/ui/badge';
 import { Image } from '@/components/ui/image';
 import { Separator } from '@/components/ui/separator';
-import type { MarsRoverPhoto } from '@/types/rover';
 import type { JSX } from 'react';
+export interface MarsRoverPhotoDto {
+  id: number;
+  imgHash: string;
+  sol: number;
+  roverId: number;
+  cameraCode: string;
+  metadata: {
+    title: string;
+    credits: string;
+    originalUrl: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface Props {
-  images: MarsRoverPhoto[];
+  images: MarsRoverPhotoDto[];
 }
 
 export function ImageGallery({ images }: Props): JSX.Element {
@@ -17,13 +30,13 @@ export function ImageGallery({ images }: Props): JSX.Element {
           <div className="rounded-xl relative" key={image.id}>
             <div className="absolute flex flex-row w-full top-2 left-2 gap-2">
               <Badge className="font-mono">Sol : {image.sol}</Badge>
-              <Badge className="font-mono">{image.camera}</Badge>
+              <Badge className="font-mono">{image.cameraCode}</Badge>
             </div>
             <div className="h-[250px]">
-              <Image alt={image.img_src} objectFit="cover" className="w-full rounded-xl" src={image.img_src} />
+              <Image alt={image.metadata.title} objectFit="cover" className="w-full rounded-xl" src={image.metadata.originalUrl} />
             </div>
             <div>
-              <Badge className="absolute bottom-2 right-2 font-mono">Credits: {image.credits}</Badge>
+              <Badge className="absolute bottom-2 right-2 font-mono">Credits: {image.metadata.credits}</Badge>
             </div>
           </div>
         ))}

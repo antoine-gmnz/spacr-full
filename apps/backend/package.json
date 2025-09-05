@@ -34,6 +34,7 @@
     "#dto/*": "./app/dto/*.js"
   },
   "devDependencies": {
+    "@spacr/shared-types": "*",
     "@adonisjs/assembler": "^7.8.2",
     "@adonisjs/eslint-config": "^2.0.0",
     "@adonisjs/prettier-config": "^1.4.4",
@@ -64,7 +65,8 @@
     "luxon": "^3.6.1",
     "pg": "^8.16.3",
     "puppeteer": "^24.16.2",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "satellite.js": "^6.0.1"
   },
   "hotHook": {
     "boundaries": [

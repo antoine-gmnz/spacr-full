@@ -5,6 +5,7 @@ import './app.css';
 import { TanstackQueryProvider } from './providers/query-provider';
 import RootLayout from '@/components/layout';
 import { ThemeProvider } from '@/context/themeContext';
+import { Toaster } from 'react-hot-toast';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -30,6 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="h-auto">
         <ThemeProvider>
+          <Toaster />
           <RootLayout>{children}</RootLayout>
           <ScrollRestoration />
           <Scripts />

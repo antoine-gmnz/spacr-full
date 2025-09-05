@@ -11,7 +11,7 @@ import { Loader } from '@/components/ui/loader';
 
 export default function MarsImages(): JSX.Element {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(20);
+  const [limit] = useState<number>(20);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
   const [parameters, setParameters] = useState<{
     rover: string;
@@ -29,10 +29,10 @@ export default function MarsImages(): JSX.Element {
     enabled: !!parameters.rover && !!parameters.begin_sol && !!parameters.end_sol,
     queryKey: ['fetchImages', parameters, currentPage],
     queryFn: async () => {
-      const { rover, camera, begin_sol, end_sol } = parameters;
+      const { rover, camera, end_sol } = parameters;
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/rover?rover=${rover}&camera=${camera}&begin_sol=${begin_sol}&end_sol=${end_sol}&limit=${limit}&page=${currentPage}`,
+          `${import.meta.env.VITE_API_URL}/rover-images/search?rover=${rover}&camera=${camera}&begin_sol=1&end_sol=${end_sol}&limit=${limit}&page=${currentPage}`,
           {
             method: 'GET',
           }
@@ -69,7 +69,7 @@ export default function MarsImages(): JSX.Element {
           </div>
         </div>
       )}
-      {data?.data && <ImageGallery images={data.data.photos} />}
+      {data?.data && <ImageGallery images={data.data} />}
       {!data && isLoading && (
         <div className="w-full h-[200px] flex justify-center items-center">
           <Loader />

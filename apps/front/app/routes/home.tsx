@@ -1,5 +1,4 @@
 import { Apod } from '@/components/apod/apod';
-import { Schedule } from '@/components/schedule';
 import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
@@ -17,9 +16,7 @@ export default function Home() {
         <div className="w-1/3">
           <Apod />
         </div>
-        <div className="w-2/3">
-          {/* <Schedule /> */}
-        </div>
+        <div className="w-2/3">{/* <Schedule /> */}</div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import { type APODResponse } from "../types/apod";
+import { type APODResponse } from '../types/apod';
 
-const API_URL = "http://localhost:3000";
+const API_URL = 'http://localhost:3000';
 
 export const apodApi = {
   getApod: async (): Promise<APODResponse> => {

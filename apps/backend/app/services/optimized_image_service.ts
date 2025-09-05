@@ -12,8 +12,8 @@ export default class OptimizedImageService {
   async getRoverImages(page: number = 1, limit: number = 20, filters?: {
     roverId?: number
     cameraCode?: string
-    solMin?: number
-    solMax?: number
+    begin_sol?: number
+    end_sol?: number
   }) {
     let query = OptimizedRoverImage.query()
       .preload('rover')
@@ -23,8 +23,8 @@ export default class OptimizedImageService {
     if (filters) {
       if (filters.roverId) query = query.where('roverId', filters.roverId)
       if (filters.cameraCode) query = query.where('cameraCode', filters.cameraCode)
-      if (filters.solMin) query = query.where('sol', '>=', filters.solMin)
-      if (filters.solMax) query = query.where('sol', '<=', filters.solMax)
+      if (filters.begin_sol) query = query.where('sol', '>=', filters.begin_sol)
+      if (filters.end_sol) query = query.where('sol', '<=', filters.end_sol)
     }
 
     const result = await query.paginate(page, limit)
@@ -124,26 +124,26 @@ export default class OptimizedImageService {
   /**
    * Search rover images by text
    */
-  async searchRoverImages(searchTerm: string, page: number = 1, limit: number = 20) {
-    const result = await OptimizedRoverImage.query()
-      .whereRaw("metadata->>'title' ILIKE ?", [`%${searchTerm}%`])
-      .orWhereRaw("metadata->>'credits' ILIKE ?", [`%${searchTerm}%`])
-      .preload('rover')
-      .preload('camera')
-      .orderBy('sol', 'desc')
-      .paginate(page, limit)
+  async searchRoverImages(roverId: number, cameraCode: string, begin_sol: number, end_sol: number, page: number = 1, limit: number = 20) {
+    try {
+      console.log('coucou 3')
+      const result = await OptimizedRoverImage.query()
+        .where('rover_id', roverId)
+        .where('camera_code', cameraCode)
+        .where('sol', '>=', begin_sol)
+        .where('sol', '<=', end_sol)
+        .orderBy('sol', 'desc')
+        .select('*')
+        .paginate(page, limit)
 
-    // Transform data to include reconstructed URLs
-    const transformedData = result.toJSON()
-    transformedData.data = transformedData.data.map((image: any) => ({
-      ...image,
-      imgSrc: ImageUrlService.reconstructRoverImageUrl(image.imgHash),
-      imgFullSize: ImageUrlService.reconstructRoverImageUrl(image.imgHash, true),
-      title: image.metadata?.title || 'Untitled',
-      credits: image.metadata?.credits || 'NASA/JPL-Caltech'
-    }))
-
-    return transformedData
+      // Transform data to include reconstructed URLs
+      const transformedData = result.toJSON()
+      const data = transformedData.data.filter(image => image.$original)
+  
+      return data
+    } catch (error) {
+      console.log('error', error)
+    }
   }
 
   /**
@@ -194,17 +194,17 @@ export default class OptimizedImageService {
 
     return {
       total: {
-        rover: Number(totalRover.total),
-        esa: Number(totalEsa.total),
-        combined: Number(totalRover.total) + Number(totalEsa.total)
+        rover: Number(totalRover.$extras.total),
+        esa: Number(totalEsa.$extras.total),
+        combined: Number(totalRover.$extras.total) + Number(totalEsa.$extras.total)
       },
       byRover: roverStats.map(stat => ({
-        roverId: stat.rover_id,
-        count: Number(stat.total)
+        roverId: stat.roverId,
+        count: Number(stat.$extras.total)
       })),
       byType: esaStats.map(stat => ({
         type: stat.type,
-        count: Number(stat.total)
+        count: Number(stat.$extras.total)
       }))
     }
   }
