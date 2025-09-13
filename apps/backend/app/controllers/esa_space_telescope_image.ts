@@ -21,7 +21,7 @@ export default class ESASpaceTelescopeImageController {
         const { page, limit, search } = await searchESAImagesValidator.validate(data)
 
         const images = (await esaSpaceTelescopeImageService.searchImages(search, page, limit)).serialize()
-
+        console.log(images)
         images.data = images.data.map((image: any) => {
             const imgSrc = OptimizedEsaImage.reconstructImageUrl(image.esaId, image.type, false)
             const imgFullSize = OptimizedEsaImage.reconstructImageUrl(image.esaId, image.type, true)
@@ -37,6 +37,6 @@ export default class ESASpaceTelescopeImageController {
             }
         })
 
-        return ctx.response.json(images.data)
+        return ctx.response.json(images)
     }
 }

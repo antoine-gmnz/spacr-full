@@ -2,13 +2,13 @@ import { SelectWrapper } from '@/components/resultsPerPage';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import type { PaginatedResponse } from '@/types/pagination';
 import { type Dispatch, type SetStateAction, useState, useEffect, type JSX } from 'react';
 import useDebounce from '@/hooks/useDebounce';
-import type { JWSTImage } from '@/types/jwst';
+import type { SpaceTelescopeImage } from '@/types/jwst';
+import type { PaginatedResponse } from '@spacr/shared-types/dto';
 
 interface ParametersProps {
-  data: PaginatedResponse<JWSTImage[]> | undefined;
+  data: PaginatedResponse<SpaceTelescopeImage> | undefined;
   currentPage: number;
   setLimit: Dispatch<SetStateAction<number>>;
   limit: number;
@@ -27,10 +27,10 @@ export function Parameters({ data, currentPage, setLimit, limit, setSearch, setT
   }, [debouncedSearch, setSearch]);
 
   const getCurrentShowing = () => {
-    if (currentPage !== data?.totalPages) {
+    if (currentPage !== data?.meta.lastPage) {
       return limit * currentPage;
     }
-    return data?.totalCount;
+    return data?.meta.total;
   };
 
   return (
@@ -71,7 +71,7 @@ export function Parameters({ data, currentPage, setLimit, limit, setSearch, setT
       </div>
       <Separator className="w-100 my-10" />
       <p className="text-slate-900 mb-5">
-        Showing {getCurrentShowing()} of {data?.totalCount}
+        Showing {getCurrentShowing()} of {data?.meta.total}
       </p>
     </>
   );

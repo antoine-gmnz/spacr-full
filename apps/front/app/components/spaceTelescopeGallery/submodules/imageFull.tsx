@@ -3,7 +3,6 @@ import { Image } from '@/components/ui/image';
 import type { SpaceTelescopeImage } from '@/types/jwst';
 
 export function ImageFull({ metadata, title, credits, type }: SpaceTelescopeImage) {
-  console.log(metadata);
   return (
     <div className="flex w-full">
       <div className="w-8/12">

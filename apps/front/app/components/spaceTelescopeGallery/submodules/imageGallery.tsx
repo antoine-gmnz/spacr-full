@@ -42,7 +42,7 @@ export function ImageGallery({ image }: ImageGalleryProps): JSX.Element {
                 <ExpandIcon />
               </Badge>
             </DialogTrigger>
-            <DialogContent className="w-[calc(70%-2rem)] h-[calc(70%-2rem)]">
+            <DialogContent className="w-[calc(70%-2rem)] h-[calc(82%-2rem)]">
               <ImageFull {...image} />
             </DialogContent>
           </Dialog>

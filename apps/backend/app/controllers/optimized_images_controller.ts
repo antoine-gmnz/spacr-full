@@ -94,7 +94,7 @@ export default class OptimizedImagesController {
   async searchEsaImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
     try {
       const { search, page, limit } = await esaImageSearchValidator.validate(request.all())
-
+      
       const result = await imageService.searchEsaImages(search, page, limit)
 
       return response.json({
