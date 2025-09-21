@@ -1,13 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { API_ROUTES } from '@/types/api-routes';
 import { TableSchedule } from '@/components/schedule/submodules/tableSchedule';
 import { Separator } from '@/components/ui/separator';
+import { useLaunches } from '@/hooks/use-launches';
 
 export default function LaunchSchedulePage() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['launches'],
-    queryFn: () => fetch(`${import.meta.env.VITE_API_URL}${API_ROUTES.LAUNCHES}`).then(res => res.json()),
-  });
+  const { data, isLoading, error } = useLaunches();
 
   return (
     <div className="container mx-auto px-4 py-8">

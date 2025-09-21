@@ -2,7 +2,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import OptimizedImageService from '#services/optimized_image_service'
 import DataOptimizationService from '#services/data_optimization_service'
-import { esaImageSearchValidator, optimizedImageValidator, roverImageSearchValidator } from '#validators/optimized_image_validators'
+import { esaImageSearchValidator, optimizedImageValidator } from '#validators/optimized_image_validators'
 import logger from '@adonisjs/core/services/logger'
 
 export default class OptimizedImagesController {
@@ -94,7 +94,7 @@ export default class OptimizedImagesController {
   async searchEsaImages({ request, response }: HttpContext, imageService: OptimizedImageService) {
     try {
       const { search, page, limit } = await esaImageSearchValidator.validate(request.all())
-      
+
       const result = await imageService.searchEsaImages(search, page, limit)
 
       return response.json({

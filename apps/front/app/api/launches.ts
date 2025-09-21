@@ -1,6 +1,5 @@
 import { LaunchDataResponse } from '../types/launch-data';
-
-const API_URL = 'http://localhost:3000';
+import { http } from '../lib/http';
 
 export interface LaunchSearchParams {
   search?: string;
@@ -11,13 +10,7 @@ export interface LaunchSearchParams {
 
 export const launchesApi = {
   getLaunches: async (): Promise<LaunchDataResponse> => {
-    const response = await fetch(`${API_URL}/launches`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch launches: ${response.status}`);
-    }
-
-    return await response.json();
+    return await http.get<LaunchDataResponse>('/launches');
   },
 
   searchLaunches: async ({ search, limit = 10, offset = 0, year }: LaunchSearchParams = {}): Promise<LaunchDataResponse> => {
@@ -34,12 +27,6 @@ export const launchesApi = {
       params.append('year', year);
     }
 
-    const response = await fetch(`${API_URL}/launches/search?${params.toString()}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to search launches: ${response.status}`);
-    }
-
-    return await response.json();
+    return await http.get<LaunchDataResponse>(`/launches/search?${params.toString()}`);
   },
 };

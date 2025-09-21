@@ -1,22 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Satellites from 'src/components/earthView/satellites';
+import { useEffect, useRef, useState, type JSX } from 'react';
+import Satellites from '@/components/earthView/satellites';
 import { Canvas } from '@react-three/fiber';
 import { Earth } from './earth';
-import { useQuery } from '@tanstack/react-query';
-import { Skeleton } from 'src/components/ui/skeleton';
-import { Credits } from 'src/components/earthView/submodules/credits';
-import { SatelliteInfo } from 'src/components/earthView/submodules/satelliteInfo';
+
+import { Credits } from '@/components/earthView/submodules/credits';
+import { SatelliteInfo } from '@/components/earthView/submodules/satelliteInfo';
 import { OrbitControls } from '@react-three/drei';
-import { Member, TleResponse } from 'src/shared-types/src/NASA';
+import { useTleData } from '@/hooks/use-tle';
+import type { TleMember } from '@/types/tle';
 
 export function EarthView(): JSX.Element {
-  const [memberData, setMemberData] = useState<Member[]>([]);
+  const [memberData, setMemberData] = useState<TleMember[]>([]);
   const controlsRef = useRef(null);
 
-  const { error, isLoading, data } = useQuery<TleResponse>({
-    queryKey: ['tleData'],
-    queryFn: () => fetch('http://localhost:4200/tle/gettledata').then(res => res.json()),
-  });
+  const { error, isLoading, data } = useTleData();
 
   useEffect(() => {
     if (data) {
@@ -25,7 +22,7 @@ export function EarthView(): JSX.Element {
   }, [data]);
 
   if (isLoading) {
-    return <Skeleton className="w-100 h-100 rounded-full" />;
+    return <div className="w-100 h-100 rounded-full" />;
   }
 
   if (error) {

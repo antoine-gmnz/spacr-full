@@ -1,11 +1,9 @@
 import { useState, type JSX } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import { ImageGallery } from '@/components/marsImages/imageGallery';
 import { PaginationWrapper } from '@/components/paginationWrapper';
 import { MarsParameters } from '@/components/marsImages/marsParameters';
-import type { PaginatedResponse } from '@/types/pagination';
-import type { MarsRoverResponse } from '@/types/rover';
+import { useSearchRoverImages } from '@/hooks/use-rover';
 import { Separator } from '@/components/ui/separator';
 import { Loader } from '@/components/ui/loader';
 
@@ -25,28 +23,15 @@ export default function MarsImages(): JSX.Element {
     end_sol: '',
   });
 
-  const { data, isLoading } = useQuery({
-    enabled: !!parameters.rover && !!parameters.begin_sol && !!parameters.end_sol,
-    queryKey: ['fetchImages', parameters, currentPage],
-    queryFn: async () => {
-      const { rover, camera, end_sol } = parameters;
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/rover-images/search?rover=${rover}&camera=${camera}&begin_sol=1&end_sol=${end_sol}&limit=${limit}&page=${currentPage}`,
-          {
-            method: 'GET',
-          }
-        );
-        const data = (await res.json()) as PaginatedResponse<MarsRoverResponse>;
-        if (!hasFetched) {
-          setHasFetched(true);
-        }
-        return data;
-      } catch (e) {
-        console.error(e);
-      }
-    },
+  const { data, isLoading } = useSearchRoverImages({
+    rover: parameters.rover,
+    camera: parameters.camera,
+    beginSol: parameters.begin_sol,
+    endSol: parameters.end_sol,
+    page: currentPage,
+    limit,
   });
+  if (!hasFetched && data) setHasFetched(true);
 
   return (
     <div className="container mx-auto px-4 py-8">

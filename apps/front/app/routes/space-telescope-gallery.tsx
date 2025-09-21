@@ -4,12 +4,9 @@ import { Parameters } from '@/components/spaceTelescopeGallery/parameters';
 import { Loader } from '@/components/ui/loader';
 import { SpaceTelescopeGallery } from '@/components/spaceTelescopeGallery/gallery';
 import { PaginationWrapper } from '@/components/paginationWrapper';
-import { useQuery } from '@tanstack/react-query';
-import { API_ROUTES } from '@/types/api-routes';
 import { Header } from '@/components/spaceTelescopeGallery/header';
 import toast from 'react-hot-toast';
-import type { SpaceTelescopeImage } from '@/types/jwst';
-import type { PaginatedResponse } from '@spacr/shared-types/dto';
+import { useSpaceGallery } from '@/hooks/use-space-gallery';
 
 export default function JwstPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -17,14 +14,7 @@ export default function JwstPage() {
   const [search, setSearch] = useState<string>('');
   const [type, setType] = useState<'HUBBLE' | 'JAMES_WEBB' | null>(null);
 
-  const { data, isLoading, error } = useQuery<PaginatedResponse<SpaceTelescopeImage>>({
-    queryKey: ['space-telescope-gallery', { currentPage, limit, search, type }],
-    queryFn: async (): Promise<PaginatedResponse<SpaceTelescopeImage>> => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}${API_ROUTES.SPACE_GALLERY}?page=${currentPage}&limit=${limit}&search=${search}&telescope=${type || ''}`);
-      if (!res.ok) throw new Error(`Request failed with ${res.status}`);
-      return (await res.json()) as PaginatedResponse<SpaceTelescopeImage>;
-    },
-  });
+  const { data, isLoading, error } = useSpaceGallery({ page: currentPage, limit, search, telescope: type });
 
   useEffect(() => {
     if (error) {
@@ -45,16 +35,18 @@ export default function JwstPage() {
           <Loader />
         </div>
       )}
-      {data && <SpaceTelescopeGallery data={data} />}
       {data && (
-        <PaginationWrapper
-          currentPage={data.meta.currentPage}
-          totalPages={data.meta.lastPage}
-          onPageChange={(page: number) => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setCurrentPage(page);
-          }}
-        />
+        <>
+          <SpaceTelescopeGallery data={data} />
+          <PaginationWrapper
+            currentPage={data.meta.currentPage}
+            totalPages={data.meta.lastPage}
+            onPageChange={(page: number) => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setCurrentPage(page);
+            }}
+          />
+        </>
       )}
       {error && <div>{error.message}</div>}
     </div>

@@ -1,12 +1,8 @@
-import { API_ROUTES } from '@/types/api-routes';
-import { useQuery } from '@tanstack/react-query';
-import SpaceScene, { type ObjectPositionDTO } from '@/components/spaceExplorer/SpaceScene';
+import SpaceScene from '@/components/spaceExplorer/SpaceScene';
+import { useSpaceExplorerPositions } from '@/hooks/use-space-explorer';
 
 export default function SpaceExplorerPage() {
-  const { data, isPending, error } = useQuery<{ success: boolean; data: { date: string; positions: ObjectPositionDTO[] } }>({
-    queryKey: ['space-explorer'],
-    queryFn: () => fetch(`${import.meta.env.VITE_API_URL}${API_ROUTES.SPACE_EXPLORER}`).then(res => res.json()),
-  });
+  const { data, isPending, error } = useSpaceExplorerPositions();
 
   if (isPending) {
     return <div>Loading...</div>;

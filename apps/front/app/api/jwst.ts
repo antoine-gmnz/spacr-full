@@ -1,7 +1,6 @@
-import { PaginatedResponse } from '../types/shared';
-import { JWSTImage } from '../types/jwst';
-
-const API_URL = 'http://localhost:3000';
+import type { PaginatedResponse } from '../types/shared';
+import type { SpaceTelescopeImage } from '../types/jwst';
+import { http } from '../lib/http';
 
 export interface JwstImagesParams {
   page?: number;
@@ -16,7 +15,7 @@ export interface JwstSearchParams {
 }
 
 export const jwstApi = {
-  getJwstImages: async ({ page = 1, limit = 10, search }: JwstImagesParams = {}): Promise<PaginatedResponse<JWSTImage[]>> => {
+  getJwstImages: async ({ page = 1, limit = 10, search }: JwstImagesParams = {}): Promise<PaginatedResponse<SpaceTelescopeImage[]>> => {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('limit', limit.toString());
@@ -25,27 +24,15 @@ export const jwstApi = {
       params.append('search', search);
     }
 
-    const response = await fetch(`${API_URL}/jwst?${params.toString()}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch JWST images: ${response.status}`);
-    }
-
-    return await response.json();
+    return await http.get<PaginatedResponse<SpaceTelescopeImage[]>>(`/jwst?${params.toString()}`);
   },
 
-  searchJwstByTitle: async ({ page = 1, limit = 10, title }: JwstSearchParams): Promise<PaginatedResponse<JWSTImage[]>> => {
+  searchJwstByTitle: async ({ page = 1, limit = 10, title }: JwstSearchParams): Promise<PaginatedResponse<SpaceTelescopeImage[]>> => {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('limit', limit.toString());
     params.append('title', title);
 
-    const response = await fetch(`${API_URL}/jwst/search-by-title?${params.toString()}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to search JWST images: ${response.status}`);
-    }
-
-    return await response.json();
+    return await http.get<PaginatedResponse<SpaceTelescopeImage[]>>(`/jwst/search-by-title?${params.toString()}`);
   },
 };
