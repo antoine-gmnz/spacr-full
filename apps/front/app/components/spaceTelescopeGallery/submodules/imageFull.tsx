@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Image } from '@/components/ui/image';
-import type { SpaceTelescopeImage } from '@/types/jwst';
+import type { SpaceTelescopeImageModel } from '@spacr/shared-types';
 
-export function ImageFull({ metadata, title, credits, type }: SpaceTelescopeImage) {
+export function ImageFull({ imgSrc, title, credits, type }: SpaceTelescopeImageModel) {
   return (
     <div className="flex w-full">
       <div className="w-8/12">
-        <Image src={metadata.imgSrc} alt={title} className="object-contain w-full h-[calc(70vh-5rem)] rounded-xl" />
+        <Image src={imgSrc.replace('large', 'screen')} alt={title} className="object-contain w-full h-[calc(70vh-5rem)] rounded-xl" />
       </div>
       <div className="w-4/12 pt-6 pl-5 pr-5 flex flex-col justify-between">
         <div className="flex flex-col gap-5">

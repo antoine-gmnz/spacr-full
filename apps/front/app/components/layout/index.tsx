@@ -9,7 +9,7 @@ export default function RootLayout({
 }>) {
   const { theme } = useTheme();
   return (
-    <main className="px-10 dark:bg-background bg-white min-h-screen" data-theme={theme}>
+    <main className="px-10 dark:bg-background min-h-screen" data-theme={theme}>
       <Navigation />
       <div className="mt-10 min-h-full">{children}</div>
       <Footer />

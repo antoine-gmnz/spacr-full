@@ -1,16 +1,21 @@
-export * from './rover';
+export type { GetRoverImagesResponseDTO } from './rover-image';
+export type { GetRoversResponseDTO } from './rover';
+export type { GetCamerasResponseDTO } from './camera';
+export type { GetSpaceTelescopeImagesResponseDTO } from './space-telescope-image';
+
+export type PaginatedData = {
+  total: number;
+  perPage: number;
+  currentPage: number;
+  lastPage: number;
+  firstPage: number;
+  firstPageUrl: string;
+  lastPageUrl: string;
+  nextPageUrl: string;
+  previousPageUrl: string | null;
+};
 
 export type PaginatedResponse<T> = {
-  meta: {
-    total: number;
-    perPage: number;
-    currentPage: number;
-    lastPage: number;
-    firstPage: number;
-    firstPageUrl: string;
-    lastPageUrl: string;
-    nextPageUrl: string;
-    previousPageUrl: string | null;
-  };
+  meta: PaginatedData;
   data: T[];
 };

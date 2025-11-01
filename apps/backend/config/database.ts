@@ -12,6 +12,13 @@ const dbConfig = defineConfig({
         user: env.get('DB_USER'),
         password: env.get('DB_PASSWORD'),
         database: env.get('DB_DATABASE'),
+        // Enable TLS for providers like Neon if requested via env or implied by host
+        ssl:
+          env.get('DB_SSL') === true ||
+          env.get('PGSSLMODE') === 'require' ||
+          String(env.get('DB_HOST') || '').includes('neon.tech')
+            ? { rejectUnauthorized: env.get('DB_SSL_REJECT_UNAUTHORIZED') !== false }
+            : undefined,
       },
       migrations: {
         naturalSort: true,

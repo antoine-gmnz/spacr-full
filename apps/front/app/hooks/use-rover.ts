@@ -1,7 +1,6 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { roverApi, type RoverImagesParams } from '../api/rover';
-import type { GetRoversResponseDTO, PaginatedResponse } from '@spacr/shared-types/dto';
-import type { MarsRoverPhotoDto } from '@spacr/shared-types';
+import type { GetRoversResponseDTO, GetRoverImagesResponseDTO, PaginatedResponse } from '@spacr/shared-types';
 
 export function useRoverImages(params: RoverImagesParams) {
   return useQuery({
@@ -11,11 +10,18 @@ export function useRoverImages(params: RoverImagesParams) {
   });
 }
 
-export function useSearchRoverImages(params: RoverImagesParams & { page?: number; limit?: number }): UseQueryResult<PaginatedResponse<MarsRoverPhotoDto>> {
-  return useQuery<PaginatedResponse<MarsRoverPhotoDto>>({
+export function useSearchRoverImages(params: RoverImagesParams & { page?: number; limit?: number }): UseQueryResult<PaginatedResponse<GetRoverImagesResponseDTO>> {
+  return useQuery<PaginatedResponse<GetRoverImagesResponseDTO>>({
     queryKey: ['rover', 'images', 'search', params],
     queryFn: () => roverApi.searchRoverImages(params),
     enabled: !!params.rover && !!params.beginSol && !!params.endSol,
+  });
+}
+
+export function useLatestRoverImages() {
+  return useQuery<PaginatedResponse<GetRoverImagesResponseDTO>>({
+    queryKey: ['rover', 'images', 'latest'],
+    queryFn: () => roverApi.getLatestRoverImages(),
   });
 }
 

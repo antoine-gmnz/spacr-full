@@ -6,6 +6,8 @@
   "author": "Antoine Gimenez",
   "license": "MIT",
   "exports": {
-    "./dto": "./dto/index.ts"
+    ".": "./index.ts",
+    "./dto": "./dto/index.ts",
+    "./models": "./models/index.ts"
   }
 }

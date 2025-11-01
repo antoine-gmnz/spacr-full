@@ -1,18 +1,24 @@
 import type { JSX } from 'react';
-import type { SpaceTelescopeImage } from '@/types/jwst';
 import { ImageGallery } from '@/components/spaceTelescopeGallery/submodules/imageGallery';
-import type { PaginatedResponse } from '@spacr/shared-types/dto';
+import { MasonryGallery } from '@/components/spaceTelescopeGallery/masonry';
+import type { SpaceTelescopeImageModel } from '@spacr/shared-types';
 
 interface SpaceTelescopeGalleryProps {
-  data: PaginatedResponse<SpaceTelescopeImage>;
+  images: SpaceTelescopeImageModel[];
 }
 
-export function SpaceTelescopeGallery({ data }: SpaceTelescopeGalleryProps): JSX.Element {
+export function SpaceTelescopeGallery({ images }: SpaceTelescopeGalleryProps): JSX.Element {
+  const getImageUrl = (image: SpaceTelescopeImageModel): string => {
+    return image.imgSrc.replace('large', 'screen');
+  };
+
   return (
-    <div className="grid grid-cols-4 gap-10 mb-10">
-      {data.data.map((image: SpaceTelescopeImage) => (
-        <ImageGallery key={image.id} image={image} />
-      ))}
-    </div>
+    <MasonryGallery
+      images={images}
+      columns={4}
+      gap={8}
+      getImageUrl={getImageUrl}
+      renderItem={(image, dimensions) => <ImageGallery key={image.id} image={image} dimensions={dimensions} />}
+    />
   );
 }

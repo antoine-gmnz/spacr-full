@@ -1,35 +1,53 @@
 import { type MarsRoverResponse } from '../types/rover';
 import { http } from '../lib/http';
-import type { GetRoversResponseDTO, PaginatedResponse } from '@spacr/shared-types/dto';
+import type { GetRoversResponseDTO, GetRoverImagesResponseDTO, PaginatedResponse } from '@spacr/shared-types/dto';
 
 export interface RoverImagesParams {
-  rover: string;
-  camera?: string;
+  rover: number;
+  camera?: number;
   beginSol?: string;
   endSol?: string;
 }
 
 export const roverApi = {
   getRovers: async (): Promise<GetRoversResponseDTO[]> => {
-    return await http.get<GetRoversResponseDTO[]>('/rovers');
+    try {
+      return await http.get<GetRoversResponseDTO[]>('/rovers');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+  getLatestRoverImages: async (): Promise<PaginatedResponse<GetRoverImagesResponseDTO>> => {
+    try {
+      return await http.get<PaginatedResponse<GetRoverImagesResponseDTO>>('/rover-image/latest');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   },
   getRoverImages: async ({ rover, camera, beginSol, endSol }: RoverImagesParams): Promise<MarsRoverResponse> => {
-    const params = new URLSearchParams();
-    params.append('rover', rover);
+    try {
+      const params = new URLSearchParams();
+      params.append('rover', rover.toString());
 
-    if (camera) {
-      params.append('camera', camera);
+      if (camera) {
+        params.append('camera', camera.toString());
+      }
+
+      if (beginSol) {
+        params.append('begin_sol', beginSol);
+      }
+
+      if (endSol) {
+        params.append('end_sol', endSol);
+      }
+
+      return await http.get<MarsRoverResponse>(`/rover?${params.toString()}`);
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-
-    if (beginSol) {
-      params.append('begin_sol', beginSol);
-    }
-
-    if (endSol) {
-      params.append('end_sol', endSol);
-    }
-
-    return await http.get<MarsRoverResponse>(`/rover?${params.toString()}`);
   },
   searchRoverImages: async ({
     rover,
@@ -38,14 +56,14 @@ export const roverApi = {
     endSol,
     page = 1,
     limit = 20,
-  }: RoverImagesParams & { page?: number; limit?: number }): Promise<PaginatedResponse<MarsRoverResponse>> => {
+  }: RoverImagesParams & { page?: number; limit?: number }): Promise<PaginatedResponse<GetRoverImagesResponseDTO>> => {
     const params = new URLSearchParams();
-    params.append('rover', rover);
-    if (camera) params.append('camera', camera);
+    params.append('rover', rover.toString());
+    if (camera) params.append('camera', camera.toString());
     if (beginSol) params.append('begin_sol', beginSol);
     if (endSol) params.append('end_sol', endSol);
     params.append('page', String(page));
     params.append('limit', String(limit));
-    return await http.get(`/rover-images/search?${params.toString()}`);
+    return await http.get(`/rover-image/search?${params.toString()}`);
   },
 };

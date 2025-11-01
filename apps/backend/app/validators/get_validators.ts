@@ -15,8 +15,8 @@ export const getRoverImagesValidator = vine.compile(vine.object({
     limit: vine.number().positive(),
     rover: vine.string(),
     camera: vine.string(),
-    beginSol: vine.number(),
-    endSol: vine.number(),
+    begin_sol: vine.number(),
+    end_sol: vine.number(),
 }))
 
 export const searchESAImagesValidator = vine.compile(vine.object({

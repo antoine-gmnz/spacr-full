@@ -1,8 +1,7 @@
-import Rover from "#models/rover"
+import Rover from '#models/rover'
 
 export default class RoverService {
-  async getRovers() {
-    const rovers = await Rover.query();
-    return rovers
+  public async getRovers() {
+    return await Rover.query().preload('cameras')
   }
 }

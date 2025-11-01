@@ -1,6 +1,5 @@
 import { http } from '../lib/http';
-import type { SpaceTelescopeImage } from '@/types/jwst';
-import type { PaginatedResponse } from '@spacr/shared-types/dto';
+import type { GetSpaceTelescopeImagesResponseDTO } from '@spacr/shared-types/dto';
 
 export interface SpaceGalleryParams {
   page?: number;
@@ -10,12 +9,12 @@ export interface SpaceGalleryParams {
 }
 
 export const spaceGalleryApi = {
-  getImages: async ({ page = 1, limit = 20, search = '', telescope = '' }: SpaceGalleryParams = {}): Promise<PaginatedResponse<SpaceTelescopeImage>> => {
+  getImages: async ({ page = 1, limit = 20, search = '', telescope = '' }: SpaceGalleryParams = {}): Promise<GetSpaceTelescopeImagesResponseDTO> => {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     params.append('search', search);
     params.append('telescope', telescope ? telescope : '');
-    return await http.get<PaginatedResponse<SpaceTelescopeImage>>(`/esa-images/search?${params.toString()}`);
+    return await http.get<GetSpaceTelescopeImagesResponseDTO>(`/esa-images/search?${params.toString()}`);
   },
 };

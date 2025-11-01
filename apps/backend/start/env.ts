@@ -29,24 +29,29 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_PASSWORD: Env.schema.string.optional(),
   DB_DATABASE: Env.schema.string(),
 
+  // Optional SSL flags for managed Postgres like Neon
+  DB_SSL: Env.schema.boolean.optional(),
+  DB_SSL_REJECT_UNAUTHORIZED: Env.schema.boolean.optional(),
+  PGSSLMODE: Env.schema.string.optional(),
+
   /*
   |----------------------------------------------------------
   | Variables for configuring redis connection
   |----------------------------------------------------------
   */
-  REDIS_HOST: Env.schema.string({ format: 'host' }),
-  REDIS_PORT: Env.schema.number(),
-  REDIS_PASSWORD: Env.schema.string.optional(),
-  REDIS_DB: Env.schema.number(),
-  REDIS_CACHE_DB: Env.schema.number(),
-  REDIS_SESSION_DB: Env.schema.number(),
-  REDIS_PREFIX: Env.schema.string(),
-  REDIS_KEY_PREFIX: Env.schema.string(),
-  QUEUE_REDIS_HOST: Env.schema.string({ format: 'host' }),
-  QUEUE_REDIS_PORT: Env.schema.number(),
-  QUEUE_REDIS_PASSWORD: Env.schema.string.optional(),
-  QUEUE_REDIS_DB: Env.schema.number(),
-  REDIS_QUEUE: Env.schema.string.optional(),
+  // REDIS_HOST: Env.schema.string({ format: 'host' }),
+  // REDIS_PORT: Env.schema.number(),
+  // REDIS_PASSWORD: Env.schema.string.optional(),
+  // REDIS_DB: Env.schema.number(),
+  // REDIS_CACHE_DB: Env.schema.number(),
+  // REDIS_SESSION_DB: Env.schema.number(),
+  // REDIS_PREFIX: Env.schema.string(),
+  // REDIS_KEY_PREFIX: Env.schema.string(),
+  // QUEUE_REDIS_HOST: Env.schema.string({ format: 'host' }),
+  // QUEUE_REDIS_PORT: Env.schema.number(),
+  // QUEUE_REDIS_PASSWORD: Env.schema.string.optional(),
+  // QUEUE_REDIS_DB: Env.schema.number(),
+  // REDIS_QUEUE: Env.schema.string.optional(),
 
   NASA_API_KEY: Env.schema.string(),
   SPACE_DEVS_API_URL: Env.schema.string(),

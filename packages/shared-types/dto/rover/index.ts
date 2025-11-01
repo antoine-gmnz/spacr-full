@@ -1,13 +1,3 @@
-import type { MarsRoverPhotoDto } from './roverImages';
+import { RoverModel } from '../../models/rover';
 
-export type { MarsRoverPhotoDto };
-
-export type GetRoversResponseDTO = {
-  id: number;
-  name: string;
-  landingDate: string;
-  launchDate: string;
-  status: string;
-  maxSol: number;
-  maxDate: string;
-};
+export type GetRoversResponseDTO = RoverModel[];

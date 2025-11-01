@@ -5,16 +5,16 @@ export default class ImageUrlService {
   private static readonly BASE_URLS = {
     ESA_WEBB: {
       large: 'https://cdn.esawebb.org/archives/images/large',
-      full: 'https://cdn.esawebb.org/archives/images/publicationjpg'
+      full: 'https://cdn.esawebb.org/archives/images/publicationjpg',
     },
     ESA_HUBBLE: {
       large: 'https://cdn.spacetelescope.org/archives/images/large',
-      full: 'https://cdn.spacetelescope.org/archives/images/publicationjpg'
+      full: 'https://cdn.spacetelescope.org/archives/images/publicationjpg',
     },
     NASA_MARS: {
       large: 'https://mars.nasa.gov/msl-raw-images/msss',
-      full: 'https://mars.nasa.gov/msl-raw-images/msss'
-    }
+      full: 'https://mars.nasa.gov/msl-raw-images/msss',
+    },
   }
 
   /**
@@ -27,11 +27,13 @@ export default class ImageUrlService {
   /**
    * Reconstruct ESA image URL from ESA ID and type
    */
-  static reconstructEsaImageUrl(esaId: string, type: EsaImageType, fullSize: boolean = false): string {
-    const baseUrl = type === 'JWST' 
-      ? this.BASE_URLS.ESA_WEBB 
-      : this.BASE_URLS.ESA_HUBBLE
-    
+  static reconstructEsaImageUrl(
+    esaId: string,
+    type: EsaImageType,
+    fullSize: boolean = false
+  ): string {
+    const baseUrl = type === 'JWST' ? this.BASE_URLS.ESA_WEBB : this.BASE_URLS.ESA_HUBBLE
+
     const sizeUrl = fullSize ? baseUrl.full : baseUrl.large
     return `${sizeUrl}/${esaId}.jpg`
   }
@@ -42,11 +44,11 @@ export default class ImageUrlService {
    */
   static reconstructRoverImageUrl(hash: string, fullSize: boolean = false): string {
     const baseUrl = this.BASE_URLS.NASA_MARS.large
-    
+
     // Convert hash back to original path structure
     // This is a placeholder - you'd implement based on your specific URL patterns
     const pathFromHash = this.hashToRoverPath(hash)
-    
+
     return `${baseUrl}/${pathFromHash}`
   }
 
@@ -59,7 +61,7 @@ export default class ImageUrlService {
     esaId?: string
   } {
     const hash = this.generateImageHash(url)
-    
+
     // Determine type based on URL pattern
     if (url.includes('esawebb.org') || url.includes('spacetelescope.org')) {
       const esaId = this.extractEsaIdFromUrl(url)
@@ -111,12 +113,13 @@ export default class ImageUrlService {
   }> {
     try {
       const response = await fetch(url, { method: 'HEAD' })
-      
+
       return {
-        size: response.headers.get('content-length') ? 
-          parseInt(response.headers.get('content-length')!) : undefined,
+        size: response.headers.get('content-length')
+          ? parseInt(response.headers.get('content-length')!)
+          : undefined,
         contentType: response.headers.get('content-type') || undefined,
-        lastModified: response.headers.get('last-modified') || undefined
+        lastModified: response.headers.get('last-modified') || undefined,
       }
     } catch {
       return {}
@@ -128,12 +131,12 @@ export default class ImageUrlService {
    */
   static async batchValidateUrls(urls: string[]): Promise<Map<string, boolean>> {
     const results = new Map<string, boolean>()
-    
+
     const promises = urls.map(async (url) => {
       const isValid = await this.validateImageUrl(url)
       results.set(url, isValid)
     })
-    
+
     await Promise.all(promises)
     return results
   }
@@ -141,18 +144,23 @@ export default class ImageUrlService {
   /**
    * Get optimized URL for different screen sizes
    */
-  static getResponsiveImageUrl(esaId: string, type: EsaImageType, size: 'thumb' | 'medium' | 'large' | 'full'): string {
+  static getResponsiveImageUrl(
+    esaId: string,
+    type: EsaImageType,
+    size: 'thumb' | 'medium' | 'large' | 'full'
+  ): string {
     const sizeMap = {
       thumb: 'thumbs',
-      medium: 'medium', 
+      medium: 'medium',
       large: 'large',
-      full: 'publicationjpg'
+      full: 'publicationjpg',
     }
-    
-    const baseUrl = type === 'JWST' 
-      ? 'https://cdn.esawebb.org/archives/images'
-      : 'https://cdn.spacetelescope.org/archives/images'
-    
+
+    const baseUrl =
+      type === 'JWST'
+        ? 'https://cdn.esawebb.org/archives/images'
+        : 'https://cdn.spacetelescope.org/archives/images'
+
     return `${baseUrl}/${sizeMap[size]}/${esaId}.jpg`
   }
 }

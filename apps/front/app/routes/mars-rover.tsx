@@ -1,9 +1,9 @@
-import { useState, type JSX } from 'react';
+import { Fragment, useState, type JSX } from 'react';
 
 import { ImageGallery } from '@/components/marsImages/imageGallery';
 import { PaginationWrapper } from '@/components/paginationWrapper';
 import { MarsParameters } from '@/components/marsImages/marsParameters';
-import { useSearchRoverImages } from '@/hooks/use-rover';
+import { useLatestRoverImages, useSearchRoverImages } from '@/hooks/use-rover';
 import { Separator } from '@/components/ui/separator';
 import { Loader } from '@/components/ui/loader';
 
@@ -12,16 +12,18 @@ export default function MarsImages(): JSX.Element {
   const [limit] = useState<number>(20);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
   const [parameters, setParameters] = useState<{
-    rover: string;
-    camera: string;
+    rover: number;
+    camera: number;
     begin_sol: string;
     end_sol: string;
   }>({
-    rover: '',
-    camera: '',
+    rover: 0,
+    camera: 0,
     begin_sol: '',
     end_sol: '',
   });
+
+  const { data: latestImages, isLoading: isLoadingLatestImages } = useLatestRoverImages();
 
   const { data, isLoading } = useSearchRoverImages({
     rover: parameters.rover,
@@ -42,7 +44,7 @@ export default function MarsImages(): JSX.Element {
       </p>
       <Separator className="w-100 my-10" />
       <MarsParameters setParameters={setParameters} isLoading={isLoading} />
-      {!data?.data && (
+      {!data?.data && !latestImages?.data && (
         <div className="my-10">
           <Separator />
           <div className="flex items-center justify-center h-100 flex-col">
@@ -54,21 +56,29 @@ export default function MarsImages(): JSX.Element {
           </div>
         </div>
       )}
-      {data?.data && <ImageGallery images={data.data} />}
-      {!data && isLoading && (
+      {data?.data && (
+        <Fragment>
+          <ImageGallery response={data} />
+          <PaginationWrapper
+            currentPage={data.meta.currentPage}
+            totalPages={data.meta.lastPage}
+            onPageChange={(page: number) => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setCurrentPage(page);
+            }}
+          />
+        </Fragment>
+      )}
+      {!data?.data && latestImages?.data && <ImageGallery response={latestImages} />}
+      {data?.data.length === 0 && (
+        <div className="flex items-center justify-center h-100 flex-col">
+          <p className="text-gray-500">No images found for the selected parameters.</p>
+        </div>
+      )}
+      {!data && (isLoading || isLoadingLatestImages) && (
         <div className="w-full h-[200px] flex justify-center items-center">
           <Loader />
         </div>
-      )}
-      {data?.data && (
-        <PaginationWrapper
-          currentPage={data.currentPage}
-          totalPages={data.totalPages}
-          onPageChange={(page: number) => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setCurrentPage(page);
-          }}
-        />
       )}
     </div>
   );

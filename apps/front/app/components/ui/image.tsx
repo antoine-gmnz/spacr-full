@@ -1,21 +1,17 @@
-import { Loader } from '@/components/ui/loader';
-import { useState, type ImgHTMLAttributes } from 'react';
+import { OptimizedImage, type OptimizedImageProps } from './optimized-image';
 
-interface Props extends ImgHTMLAttributes<HTMLImageElement> {
-  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-}
-
-export const Image = ({ src, alt, objectFit = 'cover', ...props }: Props) => {
-  const [loaded, setLoaded] = useState(false);
-
-  return (
-    <>
-      {!loaded && (
-        <div className="w-full h-full flex items-center justify-center">
-          <Loader />
-        </div>
-      )}
-      <img src={src} alt={alt} {...props} onLoad={() => setLoaded(true)} className={`object-${objectFit} ${props.className ?? ''} ${!loaded ? 'h-0' : 'h-full'}`} />
-    </>
-  );
+/**
+ * Image component - Backward compatible wrapper around OptimizedImage
+ *
+ * This component maintains the same API as the previous Image component
+ * but uses the new OptimizedImage under the hood for better performance.
+ *
+ * @deprecated Consider using OptimizedImage directly for more features
+ */
+export const Image = ({ src, alt, objectFit = 'cover', ...props }: OptimizedImageProps) => {
+  return <OptimizedImage src={src} alt={alt} objectFit={objectFit} lazy={false} {...props} />;
 };
+
+// Re-export OptimizedImage for direct use
+export { OptimizedImage } from './optimized-image';
+export type { OptimizedImageProps } from './optimized-image';

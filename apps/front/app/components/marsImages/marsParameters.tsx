@@ -3,18 +3,18 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { convertEarthDateToMarsSol } from '@/lib/utils';
-import { type MarsRoverPhotosCameraNamesAbv, MappingRoverNamesAndCameras, type RoverManifest, MarsRoverManifest } from '@/types/rover';
 import { Spinner } from '@radix-ui/themes';
 import { useForm } from '@tanstack/react-form';
 import { useState, type JSX } from 'react';
 import { useRovers } from '@/hooks/use-rover';
+import type { CameraModel, RoverModel } from '@spacr/shared-types';
 
 interface ParametersProps {
   isLoading?: boolean;
   setParameters: React.Dispatch<
     React.SetStateAction<{
-      rover: string;
-      camera: string;
+      rover: number;
+      camera: number;
       begin_sol: string;
       end_sol: string;
     }>
@@ -22,8 +22,8 @@ interface ParametersProps {
 }
 
 export function MarsParameters({ setParameters }: ParametersProps): JSX.Element {
-  const [cameras, setCameras] = useState<MarsRoverPhotosCameraNamesAbv[]>([]);
-  const [roverManifest, setRoverManifest] = useState<undefined | Omit<RoverManifest, 'cameras'>>(undefined);
+  const [cameras, setCameras] = useState<CameraModel[]>([]);
+  const [roverManifest, setRoverManifest] = useState<undefined | RoverModel>(undefined);
 
   const { data: rovers } = useRovers();
 
@@ -37,8 +37,8 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
       });
     },
     defaultValues: {
-      rover: '',
-      camera: '',
+      rover: 0,
+      camera: 0,
       begin_sol: '',
       end_sol: '',
     },
@@ -55,9 +55,12 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
     if (!selectedRoverId) setCameras([]);
 
     const roverName = getRoverName(Number(selectedRoverId));
+    const rover = rovers?.find(rover => rover.name === roverName);
 
-    setCameras(MappingRoverNamesAndCameras[roverName.toLowerCase() as keyof typeof MappingRoverNamesAndCameras]);
-    setRoverManifest(MarsRoverManifest[roverName.toLowerCase()]);
+    if (!rover) return;
+
+    setCameras(rover.cameras || []);
+    setRoverManifest(rover);
   };
 
   const getEndDate = (): string => {
@@ -65,7 +68,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
       const today = new Date();
       return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
     }
-    return roverManifest?.landing_date || '';
+    return roverManifest?.landingDate || '';
   };
 
   return (
@@ -92,7 +95,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
             onChange: () => {
               form.setFieldValue('begin_sol', '');
               form.setFieldValue('end_sol', '');
-              form.setFieldValue('camera', '');
+              form.setFieldValue('camera', 0);
             },
           }}
           children={field => (
@@ -101,7 +104,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
               <Select
                 value={field.state.value}
                 onValueChange={e => {
-                  field.handleChange(e);
+                  field.handleChange(Number(e));
                 }}
               >
                 <SelectTrigger className="w-[180px]">
@@ -111,7 +114,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
                   <SelectGroup>
                     <SelectLabel>Rovers</SelectLabel>
                     {rovers?.map(rover => (
-                      <SelectItem key={rover.id} value={rover.id.toString()} className="hover:cursor-pointer">
+                      <SelectItem key={rover.id} value={rover.id} className="hover:cursor-pointer">
                         {rover.name}
                       </SelectItem>
                     ))}
@@ -127,10 +130,10 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
             <div className="flex flex-col gap-2">
               <Label htmlFor="sol-to">Select camera :</Label>
               <Select
-                value={field.state.value}
+                value={field.state.value.toString()}
                 disabled={cameras?.length <= 0}
                 onValueChange={e => {
-                  field.handleChange(e);
+                  field.handleChange(Number(e));
                 }}
               >
                 <SelectTrigger className="w-[180px]">
@@ -139,9 +142,9 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Cameras :</SelectLabel>
-                    {cameras.map(camera => (
-                      <SelectItem key={camera} value={camera} className="hover:cursor-pointer">
-                        {camera}
+                    {roverManifest?.cameras?.map((camera: CameraModel) => (
+                      <SelectItem key={camera.id} value={camera.id.toString()} className="hover:cursor-pointer">
+                        {camera.fullName}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -157,7 +160,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
             <div className="flex flex-col gap-2 z-30">
               <Label htmlFor="sol-to">From :</Label>
               <DatePicker
-                disabled={form.getFieldValue('rover').length <= 0}
+                disabled={form.getFieldValue('rover') === 0}
                 placeholder="Pick a date"
                 fromDate={roverManifest?.landing_date}
                 toDate={getEndDate()}
@@ -174,7 +177,7 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
             <div className="flex flex-col gap-2 z-30">
               <Label htmlFor="sol-to">To :</Label>
               <DatePicker
-                disabled={form.getFieldValue('rover').length <= 0}
+                disabled={form.getFieldValue('rover') === 0}
                 placeholder="Pick a date"
                 fromDate={roverManifest?.landing_date}
                 toDate={getEndDate()}

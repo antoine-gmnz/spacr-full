@@ -4,19 +4,19 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { type Dispatch, type SetStateAction, useState, useEffect, type JSX } from 'react';
 import useDebounce from '@/hooks/useDebounce';
-import type { SpaceTelescopeImage } from '@/types/jwst';
-import type { PaginatedResponse } from '@spacr/shared-types/dto';
+import type { GetSpaceTelescopeImagesResponseDTO } from '@spacr/shared-types/dto';
 
 interface ParametersProps {
-  data: PaginatedResponse<SpaceTelescopeImage> | undefined;
+  data: GetSpaceTelescopeImagesResponseDTO | undefined;
   currentPage: number;
   setLimit: Dispatch<SetStateAction<number>>;
   limit: number;
   setSearch: Dispatch<SetStateAction<string>>;
   setType: Dispatch<SetStateAction<'HUBBLE' | 'JAMES_WEBB' | null>>;
+  totalLoaded?: number;
 }
 
-export function Parameters({ data, currentPage, setLimit, limit, setSearch, setType }: ParametersProps): JSX.Element {
+export function Parameters({ data, currentPage, setLimit, limit, setSearch, setType, totalLoaded }: ParametersProps): JSX.Element {
   const [search, setSearchInput] = useState<string>('');
 
   const debouncedSearch = useDebounce(search, 500);
@@ -27,6 +27,9 @@ export function Parameters({ data, currentPage, setLimit, limit, setSearch, setT
   }, [debouncedSearch, setSearch]);
 
   const getCurrentShowing = () => {
+    if (totalLoaded !== undefined) {
+      return totalLoaded;
+    }
     if (currentPage !== data?.meta.lastPage) {
       return limit * currentPage;
     }
