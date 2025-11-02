@@ -63,14 +63,6 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
     setRoverManifest(rover);
   };
 
-  const getEndDate = (): string => {
-    if (roverManifest?.status === 'active') {
-      const today = new Date();
-      return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-    }
-    return roverManifest?.landingDate || '';
-  };
-
   return (
     <>
       <form
@@ -162,8 +154,6 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
               <DatePicker
                 disabled={form.getFieldValue('rover') === 0}
                 placeholder="Pick a date"
-                fromDate={roverManifest?.landing_date}
-                toDate={getEndDate()}
                 onValueChange={(e: Date) => {
                   field.handleChange(convertEarthDateToMarsSol(getRoverName(Number(form.getFieldValue('rover'))), e).toString());
                 }}
@@ -179,8 +169,6 @@ export function MarsParameters({ setParameters }: ParametersProps): JSX.Element 
               <DatePicker
                 disabled={form.getFieldValue('rover') === 0}
                 placeholder="Pick a date"
-                fromDate={roverManifest?.landing_date}
-                toDate={getEndDate()}
                 onValueChange={(e: Date) => {
                   field.handleChange(convertEarthDateToMarsSol(getRoverName(Number(form.getFieldValue('rover'))), e).toString());
                 }}

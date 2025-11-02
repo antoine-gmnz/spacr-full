@@ -10,16 +10,15 @@
 import router from '@adonisjs/core/services/router'
 
 const RoverImagesController = () => import('#controllers/rover-images.controller')
-const OptimizedImagesController = () => import('#controllers/optimized_images_controller')
 const SpaceTelescopeImagesController = () =>
   import('#controllers/space-telescope-images-scraping.controller')
 const NasaRoverScrapingController = () => import('#controllers/nasa-rover-scraping.controller')
 const NasaRssApiController = () => import('#controllers/nasa-rss-api.controller')
-const SpaceExplorerController = () => import('#controllers/space_explorer_controller')
 const ApodController = () => import('#controllers/apod.controller')
 const RoverController = () => import('#controllers/rover.controller')
 const ESASpaceTelescopeImageController = () =>
   import('#controllers/space_telescope_image.controller')
+const LaunchesController = () => import('#controllers/launches.controller')
 
 // Optimized API routes
 router
@@ -29,18 +28,9 @@ router
     router.get('rover-image', [RoverImagesController, 'getImages'])
     router.get('/rover-image/latest', [RoverImagesController, 'getLatestRoverImages'])
 
-    router.get('/rover_image/:id', [OptimizedImagesController, 'getRoverImage'])
-
     // ESA telescope images
     router.get('/esa-images', [ESASpaceTelescopeImageController, 'getImages'])
     router.get('/esa-images/search', [ESASpaceTelescopeImageController, 'searchImages'])
-
-    // Lookup data
-    router.get('/cameras', [OptimizedImagesController, 'getCameras'])
-    router.get('/constellations', [OptimizedImagesController, 'getConstellations'])
-
-    // Statistics and analytics
-    router.get('/stats', [OptimizedImagesController, 'getStats'])
 
     // ESA scraping endpoints
     router.post('/esa-scraping/start-initial', [
@@ -59,14 +49,14 @@ router
     router.get('/nasa/rss/feed-page', [NasaRssApiController, 'getFeedPage'])
     router.get('/nasa/rss/stats', [NasaRssApiController, 'getExtractionStats'])
 
-    // Space Explorer (3D) endpoints
-    router.get('/space-explorer/positions', [SpaceExplorerController, 'getPositions'])
-    router.get('/space-explorer/satellites', [SpaceExplorerController, 'getSatellites'])
-
     // APOD endpoints
     router.get('/apod', [ApodController, 'getApod'])
 
     // Rover endpoints
     router.get('/rovers', [RoverController, 'getRovers'])
+
+    // Launches endpoints
+    router.get('/launches', [LaunchesController, 'getLaunches'])
+    router.get('/launches/search', [LaunchesController, 'searchLaunches'])
   })
   .prefix('/api/v1')

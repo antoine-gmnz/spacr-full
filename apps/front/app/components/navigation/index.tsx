@@ -3,6 +3,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, Link } from '@r
 import { EarthIcon, HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, SunIcon } from 'lucide-react';
 
 import LogoH from '@/assets/logo-hor.svg';
+import LogoW from '@/assets/logo-white.svg';
 import { type JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/context/themeContext';
@@ -22,7 +23,7 @@ export function Navigation(): JSX.Element {
     <NavigationMenu className="flex justify-between">
       <div className="flex items-center">
         <div className="w-[100px] h-16 flex items-center">
-          <img alt="Spacr logo" className="w-full dark:text-white text-black" src={LogoH} />
+          <img alt="Spacr logo" className="w-full" src={theme === 'light' ? LogoH : LogoW} />
         </div>
         <NavigationMenuList className="flex w-full gap-5 justify-center my-3 ml-10">
           {items.map((item, index) => (

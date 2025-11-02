@@ -10,9 +10,9 @@ export interface RoverImagesParams {
 }
 
 export const roverApi = {
-  getRovers: async (): Promise<GetRoversResponseDTO[]> => {
+  getRovers: async (): Promise<GetRoversResponseDTO> => {
     try {
-      return await http.get<GetRoversResponseDTO[]>('/rovers');
+      return await http.get<GetRoversResponseDTO>('/rovers');
     } catch (error) {
       console.error(error);
       throw error;

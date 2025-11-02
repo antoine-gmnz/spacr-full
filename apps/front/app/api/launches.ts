@@ -1,5 +1,5 @@
-import { LaunchDataResponse } from '../types/launch-data';
 import { http } from '../lib/http';
+import type { LaunchDataResponse } from '@spacr/shared-types';
 
 export interface LaunchSearchParams {
   search?: string;

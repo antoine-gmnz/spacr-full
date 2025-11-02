@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Collapsible } from '@radix-ui/react-collapsible';
-import { DownloadIcon, ExpandIcon, InfoIcon } from 'lucide-react';
+import { ExpandIcon, InfoIcon } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { useState, type JSX } from 'react';
 import type { SpaceTelescopeImageModel } from '@spacr/shared-types';
@@ -18,7 +18,7 @@ interface ImageGalleryWithDimensionsProps extends ImageGalleryProps {
 }
 
 export function ImageGallery({ image }: ImageGalleryWithDimensionsProps): JSX.Element {
-  const { imgSrc, imgFullSize, title, type } = image;
+  const { imgSrc, title, type } = image;
   const [detailsOpen, setDetailsOpen] = useState(false);
   const getScreenSizeUrl = (url: string): string => {
     return url.replace('large', 'screen');
@@ -32,9 +32,6 @@ export function ImageGallery({ image }: ImageGalleryWithDimensionsProps): JSX.El
             <Badge className="font-mono bg-card dark:text-white text-black">{type}</Badge>
           </div>
           <div className="h-10 absolute top-3 right-3 z-20 flex gap-1 flex-row">
-            <Badge onClick={() => window.open(imgFullSize, '_blank')?.focus()} className="font-mono bg-card dark:text-white text-black cursor-pointer">
-              <DownloadIcon />
-            </Badge>
             <CollapsibleTrigger asChild>
               <Badge className="font-mono bg-card dark:text-white text-black cursor-pointer">
                 <InfoIcon />
@@ -46,7 +43,7 @@ export function ImageGallery({ image }: ImageGalleryWithDimensionsProps): JSX.El
                   <ExpandIcon />
                 </Badge>
               </DialogTrigger>
-              <DialogContent className="w-[calc(70%-2rem)] h-[calc(82%-2rem)]">
+              <DialogContent className="w-[calc(70%-2rem)]">
                 <ImageFull {...image} />
               </DialogContent>
             </Dialog>

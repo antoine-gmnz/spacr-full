@@ -3,7 +3,7 @@ import type { JSX } from 'react';
 export function Header(): JSX.Element {
   return (
     <div className="w-full h-auto">
-      <h1 className="text-3xl font-bold text-slate-900 font-mono uppercase">Space Telescope image gallery</h1>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-mono uppercase">Space Telescope image gallery</h1>
       <div className="flex mt-5 flex-col gap-1">
         <p className="mt-2 w-full">The Hubble Space Telescope, launched in 1990, revolutionized our view of the cosmos with its stunning images and discoveries.</p>
         <p>

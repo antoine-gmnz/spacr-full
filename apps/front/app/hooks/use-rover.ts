@@ -26,7 +26,7 @@ export function useLatestRoverImages() {
 }
 
 export function useRovers() {
-  return useQuery<GetRoversResponseDTO[]>({
+  return useQuery<GetRoversResponseDTO>({
     queryKey: ['rovers'],
     queryFn: () => roverApi.getRovers(),
   });

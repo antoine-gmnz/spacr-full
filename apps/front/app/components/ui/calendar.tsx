@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
+import { Select, SelectValue, SelectTrigger, SelectLabel, SelectContent, SelectGroup } from './select';
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: React.ComponentProps<typeof DayPicker>) {
   return (
@@ -23,6 +25,24 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
         head_row: 'flex',
         head_cell: 'text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]',
         row: 'flex w-full mt-2',
+        root: 'bg-card',
+        dropdowns: 'flex items-center gap-2 justify-center',
+        dropdown: cn(
+          'h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        ),
+        dropdown_root: 'relative',
+        months_dropdown: cn(
+          'h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        ),
+        years_dropdown: cn(
+          'h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        ),
         cell: cn(
           'relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-range-end)]:rounded-r-md',
           props.mode === 'range'
@@ -41,8 +61,34 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => <ChevronLeft className={cn('size-4', className)} {...props} />,
-        IconRight: ({ className, ...props }) => <ChevronRight className={cn('size-4', className)} {...props} />,
+        MonthsDropdown: ({ className, ...props }) => {
+          return (
+            <div
+              className={cn(
+                'h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors',
+                'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                className
+              )}
+              {...props}
+            />
+          );
+        },
+        YearsDropdown: ({ className, ...props }) => {
+          return (
+            <Select value={props.value?.toString()} onValueChange={props.onChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a year" />
+              </SelectTrigger>
+            </Select>
+          );
+        },
+        Chevron: ({ orientation, className, ...props }) => {
+          if (orientation === 'left') {
+            return <ChevronLeft className={cn('size-4', className)} {...props} />;
+          }
+          return <ChevronRight className={cn('size-4', className)} {...props} />;
+        },
       }}
       {...props}
     />
