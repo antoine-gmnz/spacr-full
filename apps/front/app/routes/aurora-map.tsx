@@ -113,6 +113,8 @@ export default function AuroraMapPage() {
     );
   }
 
+  console.log(auroraData);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -256,13 +258,13 @@ export default function AuroraMapPage() {
             <div className="pb-4">
               <h3 className="text-sm text-white font-bold">Viewing Tips</h3>
             </div>
-            <div className="text-xs text-slate-400 space-y-2">
-              <p>• Find a location away from city lights</p>
-              <p>• Clear skies are essential for viewing</p>
-              <p>• Best viewing times: 10 PM - 2 AM local</p>
-              <p>• Allow 20-30 min for eyes to adjust to darkness</p>
-              <p>• Higher Kp = aurora visible at lower latitudes</p>
-            </div>
+            <ul className="text-xs text-slate-400 space-y-2 list-disc list-inside">
+              <li>Find a location away from city lights</li>
+              <li>Clear skies are essential for viewing</li>
+              <li>Best viewing times: 10 PM - 2 AM local</li>
+              <li>Allow 20-30 min for eyes to adjust to darkness</li>
+              <li>Higher Kp = aurora visible at lower latitudes</li>
+            </ul>
           </div>
         </div>
       </div>

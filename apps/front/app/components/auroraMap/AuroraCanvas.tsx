@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import type { AuroraPoint } from '@/types/aurora';
-import earthTexture from '@/assets/earth-texture-map.jpg';
+import earthTexture from '@/assets/2k_earth_specular_map.jpg';
 
 interface AuroraCanvasProps {
   auroraData: AuroraPoint[];

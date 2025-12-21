@@ -11,7 +11,7 @@ export default class LaunchesService {
   private readonly baseUrl = 'https://ll.thespacedevs.com/2.3.0/launches'
 
   public async getLaunches(): Promise<LaunchDataResponse> {
-    const response = await fetch(`${this.baseUrl}/?limit=20&ordering=net`)
+    const response = await fetch(`${this.baseUrl}/?limit=20&ordering=-net`)
     if (!response.ok) {
       throw new Error(`Failed to fetch launches: ${response.statusText}`)
     }
@@ -30,10 +30,16 @@ export default class LaunchesService {
   }
 
   public async searchLaunches(params: LaunchSearchParams = {}): Promise<LaunchDataResponse> {
-    const url = new URL(this.baseUrl)
+    // Use upcoming launches endpoint by default (shows launches from now into the future)
+    // If a year filter is applied for past years, use the main launches endpoint
+    const currentYear = new Date().getFullYear()
+    const isPastYearFilter = params.year && parseInt(params.year) < currentYear
+    
+    const baseEndpoint = isPastYearFilter ? this.baseUrl : `${this.baseUrl}/upcoming`
+    const url = new URL(baseEndpoint)
     const searchParams = new URLSearchParams()
 
-    // Set default ordering by launch time
+    // Set ordering by launch time (ascending - soonest first for upcoming)
     searchParams.append('ordering', 'net')
 
     if (params.search) {
@@ -60,10 +66,13 @@ export default class LaunchesService {
 
     url.search = searchParams.toString()
 
+    console.log('Fetching launches from:', url.toString())
     const response = await fetch(url.toString())
 
     if (!response.ok) {
-      throw new Error(`Failed to search launches: ${response.statusText}`)
+      const errorText = await response.text()
+      console.error('API Error:', response.status, errorText)
+      throw new Error(`Failed to search launches: ${response.status} - ${errorText}`)
     }
 
     return (await response.json()) as LaunchDataResponse

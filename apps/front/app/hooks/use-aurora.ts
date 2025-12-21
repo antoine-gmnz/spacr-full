@@ -29,4 +29,3 @@ export function useAuroraVisibility(lat: number | null, lng: number | null) {
     staleTime: 5 * 60 * 1000,
   });
 }
-
