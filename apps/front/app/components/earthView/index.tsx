@@ -2,31 +2,45 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import Satellites from '@/components/earthView/satellites';
 import { Canvas } from '@react-three/fiber';
 import { Earth } from './earth';
+import { Aurora } from './aurora';
 
 import { Credits } from '@/components/earthView/submodules/credits';
 import { SatelliteInfo } from '@/components/earthView/submodules/satelliteInfo';
 import { OrbitControls } from '@react-three/drei';
 import { useTleData } from '@/hooks/use-tle';
+import { useAuroraData } from '@/hooks/use-aurora';
 import type { TleMember } from '@/types/tle';
 
-export function EarthView(): JSX.Element {
+interface EarthViewProps {
+  showAurora?: boolean;
+  showSatellites?: boolean;
+}
+
+export function EarthView({ showAurora = true, showSatellites = true }: EarthViewProps): JSX.Element {
   const [memberData, setMemberData] = useState<TleMember[]>([]);
   const controlsRef = useRef(null);
 
-  const { error, isLoading, data } = useTleData();
+  const { error: tleError, isLoading: tleLoading, data: tleData } = useTleData();
+  const { data: auroraData, isLoading: auroraLoading } = useAuroraData();
 
   useEffect(() => {
-    if (data) {
-      setMemberData(data.member);
+    if (tleData) {
+      setMemberData(tleData.member);
     }
-  }, [data]);
+  }, [tleData]);
+
+  const isLoading = tleLoading || (showAurora && auroraLoading);
 
   if (isLoading) {
-    return <div className="w-100 h-100 rounded-full" />;
+    return (
+      <div className="w-100 h-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (tleError) {
+    return <div>Error: {tleError.message}</div>;
   }
 
   return (
@@ -44,8 +58,20 @@ export function EarthView(): JSX.Element {
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} />
         <Earth />
-        {memberData.length > 0 && <Satellites satelliteMemberList={memberData} controlsRef={controlsRef} />}
+        {showAurora && auroraData?.coordinates && (
+          <Aurora auroraData={auroraData.coordinates} visible={true} />
+        )}
+        {showSatellites && memberData.length > 0 && (
+          <Satellites satelliteMemberList={memberData} controlsRef={controlsRef} />
+        )}
       </Canvas>
+      {showAurora && auroraData && (
+        <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg backdrop-blur-sm">
+          <div className="text-sm font-semibold text-green-400">Aurora Activity</div>
+          <div className="text-xs opacity-80">Kp Index: {auroraData.kpIndex}</div>
+          <div className="text-xs opacity-60">Updated: {new Date(auroraData.forecastTime).toLocaleTimeString()}</div>
+        </div>
+      )}
       <SatelliteInfo />
       <Credits />
     </div>

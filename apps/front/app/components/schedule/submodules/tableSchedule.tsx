@@ -1,6 +1,6 @@
 import { TableScheduleRow } from '@/components/schedule/submodules/tableScheduleRow';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import type { LaunchData } from '@/types/launch-data';
+import type { LaunchData } from '@spacr/shared-types';
 import type { JSX } from 'react';
 import { Image } from '@/components/ui/image';
 

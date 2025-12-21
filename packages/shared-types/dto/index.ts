@@ -3,6 +3,7 @@ export type { GetRoversResponseDTO } from './rover';
 export type { GetCamerasResponseDTO } from './camera';
 export type { GetSpaceTelescopeImagesResponseDTO } from './space-telescope-image';
 export type { LaunchData, LaunchDataResponse } from './launch';
+export type { AuroraPoint, AuroraData, AuroraVisibility, AuroraVisibilityRequest } from './aurora';
 
 export type PaginatedData = {
   total: number;

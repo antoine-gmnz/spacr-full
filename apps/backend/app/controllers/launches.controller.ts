@@ -16,6 +16,19 @@ export default class LaunchesController {
   }
 
   @inject()
+  async getUpcomingLaunches({ request, response }: HttpContext, launchesService: LaunchesService) {
+    try {
+      const limit = request.input('limit', 10)
+      const launches = await launchesService.getUpcomingLaunches(limit)
+      console.log(launches)
+      return response.json(launches)
+    } catch (error) {
+      logger.error('Failed to get upcoming launches: %o', error)
+      return response.status(500).json({ message: 'Failed to get upcoming launches' })
+    }
+  }
+
+  @inject()
   async searchLaunches({ request, response }: HttpContext, launchesService: LaunchesService) {
     try {
       const searchParams: LaunchSearchParams = {

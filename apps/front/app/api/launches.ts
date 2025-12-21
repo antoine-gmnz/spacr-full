@@ -13,6 +13,10 @@ export const launchesApi = {
     return await http.get<LaunchDataResponse>('/launches');
   },
 
+  getUpcomingLaunches: async (limit: number = 10): Promise<LaunchDataResponse> => {
+    return await http.get<LaunchDataResponse>(`/launches/upcoming?limit=${limit}`);
+  },
+
   searchLaunches: async ({ search, limit = 10, offset = 0, year }: LaunchSearchParams = {}): Promise<LaunchDataResponse> => {
     const params = new URLSearchParams();
 

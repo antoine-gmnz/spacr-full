@@ -12,9 +12,18 @@ export default class LaunchesService {
 
   public async getLaunches(): Promise<LaunchDataResponse> {
     const response = await fetch(`${this.baseUrl}/?limit=20&ordering=net`)
-
     if (!response.ok) {
       throw new Error(`Failed to fetch launches: ${response.statusText}`)
+    }
+
+    return (await response.json()) as LaunchDataResponse
+  }
+
+  public async getUpcomingLaunches(limit: number = 10): Promise<LaunchDataResponse> {
+    const response = await fetch(`${this.baseUrl}/upcoming/?limit=${limit}&ordering=net`)
+    console.log(response)
+    if (!response.ok || response.status !== 200) {
+      throw new Error(`Failed to fetch upcoming launches: ${response}`)
     }
 
     return (await response.json()) as LaunchDataResponse

@@ -1,6 +1,6 @@
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, Link } from '@radix-ui/react-navigation-menu';
-import { EarthIcon, HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, SunIcon } from 'lucide-react';
+import { EarthIcon, HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, Sparkles, SunIcon } from 'lucide-react';
 
 import LogoH from '@/assets/logo-hor.svg';
 import LogoW from '@/assets/logo-white.svg';
@@ -14,6 +14,7 @@ const items = [
   { label: 'Space Telescope Gallery', href: '/space-telescope-gallery', icon: <SatelliteIcon size={17} /> },
   { label: 'Launch Schedule', href: '/launch-schedule', icon: <RocketIcon size={17} /> },
   { label: 'Space Explorer', href: '/space-explorer', icon: <OrbitIcon size={17} /> },
+  { label: 'Aurora Map', href: '/aurora-map', icon: <Sparkles size={17} /> },
 ];
 
 export function Navigation(): JSX.Element {

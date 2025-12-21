@@ -1,4 +1,4 @@
-import type { LaunchImage, LaunchServiceProvider, Mission, Pad } from '@/types/launch-data';
+import type { LaunchImage, LaunchServiceProvider, Mission, Pad } from '@spacr/shared-types';
 import { Separator } from '@/components/ui/separator';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';

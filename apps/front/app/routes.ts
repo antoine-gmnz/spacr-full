@@ -8,4 +8,5 @@ export default [
   route('launch-schedule', './routes/launch-schedule.tsx'),
   route('earth-view', './routes/earth-view.tsx'),
   route('space-explorer', './routes/space-explorer.tsx'),
+  route('aurora-map', './routes/aurora-map.tsx'),
 ] satisfies RouteConfig;

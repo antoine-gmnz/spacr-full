@@ -19,6 +19,7 @@ const RoverController = () => import('#controllers/rover.controller')
 const ESASpaceTelescopeImageController = () =>
   import('#controllers/space_telescope_image.controller')
 const LaunchesController = () => import('#controllers/launches.controller')
+const AuroraController = () => import('#controllers/aurora.controller')
 
 // Optimized API routes
 router
@@ -57,6 +58,11 @@ router
 
     // Launches endpoints
     router.get('/launches', [LaunchesController, 'getLaunches'])
+    router.get('/launches/upcoming', [LaunchesController, 'getUpcomingLaunches'])
     router.get('/launches/search', [LaunchesController, 'searchLaunches'])
+
+    // Aurora endpoints
+    router.get('/aurora', [AuroraController, 'getAuroraData'])
+    router.get('/aurora/visibility', [AuroraController, 'getVisibility'])
   })
   .prefix('/api/v1')

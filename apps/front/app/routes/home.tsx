@@ -1,4 +1,5 @@
 import { Apod } from '@/components/apod/apod';
+import { UpcomingLaunch } from '@/components/upcoming-launch';
 import { Separator } from '@/components/ui/separator';
 import image from '@/assets/mars.png';
 import imageWebb from '@/assets/webb.jpg';
@@ -17,6 +18,13 @@ export default function Home() {
           in doloremque ratione iusto odio, dolore consequatur dolores alias.
         </p>
       </div>
+      <Separator />
+
+      {/* Upcoming Launch Section */}
+      <div className="mt-8 mb-8">
+        <UpcomingLaunch />
+      </div>
+
       <Separator />
       <div className="w-full h-full flex gap-2 mt-5">
         <div className="w-4/12 h-[550px]">
