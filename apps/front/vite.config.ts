@@ -11,4 +11,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './app'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3333',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

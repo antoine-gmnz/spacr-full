@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type JSX } from 'react';
+import { useEffect, useRef, useState, type JSX, Suspense } from 'react';
 import Satellites from '@/components/earthView/satellites';
 import { Canvas } from '@react-three/fiber';
 import { Earth } from './earth';
 import { Aurora } from './aurora';
+import { ISS } from './iss';
 
 import { Credits } from '@/components/earthView/submodules/credits';
 import { SatelliteInfo } from '@/components/earthView/submodules/satelliteInfo';
@@ -10,13 +11,17 @@ import { OrbitControls } from '@react-three/drei';
 import { useTleData } from '@/hooks/use-tle';
 import { useAuroraData } from '@/hooks/use-aurora';
 import type { TleMember } from '@/types/tle';
+import type { ISSPosition } from '@/types/iss';
 
 interface EarthViewProps {
   showAurora?: boolean;
   showSatellites?: boolean;
+  showISS?: boolean;
+  issPosition?: ISSPosition | null;
+  showISSTrail?: boolean;
 }
 
-export function EarthView({ showAurora = true, showSatellites = true }: EarthViewProps): JSX.Element {
+export function EarthView({ showAurora = true, showSatellites = true, showISS = false, issPosition = null, showISSTrail = false }: EarthViewProps): JSX.Element {
   const [memberData, setMemberData] = useState<TleMember[]>([]);
   const controlsRef = useRef(null);
 
@@ -63,6 +68,11 @@ export function EarthView({ showAurora = true, showSatellites = true }: EarthVie
         )}
         {showSatellites && memberData.length > 0 && (
           <Satellites satelliteMemberList={memberData} controlsRef={controlsRef} />
+        )}
+        {showISS && (
+          <Suspense fallback={null}>
+            <ISS position={issPosition} showOrbitTrail={showISSTrail} />
+          </Suspense>
         )}
       </Canvas>
       {showAurora && auroraData && (

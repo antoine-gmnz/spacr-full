@@ -1,4 +1,4 @@
-import { TleResponse } from '../types/tle';
+import type { TleResponse } from '../types/tle';
 import { http } from '../lib/http';
 
 export const tleApi = {

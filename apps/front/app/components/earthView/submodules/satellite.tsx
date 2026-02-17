@@ -1,5 +1,5 @@
-import type { SatelliteVectorData } from 'src/components/earthView/type';
-import { useSelectedSatellite } from 'src/context/satelliteContext';
+import type { SatelliteVectorData } from '@/components/earthView/type';
+import { useSelectedSatellite } from '@/context/satelliteContext';
 import { useThree } from '@react-three/fiber';
 import React, { useState } from 'react';
 import gsap from 'gsap';

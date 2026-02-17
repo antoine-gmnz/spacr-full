@@ -1,0 +1,129 @@
+---
+description: Shared types and DTOs between frontend and backend
+globs: ["packages/shared-types/**/*"]
+---
+
+# Shared Types Package Rules
+
+## Purpose
+
+The `@spacr/shared-types` package contains TypeScript types and DTOs shared between the frontend and backend to ensure type safety across the API boundary.
+
+## Structure
+
+```
+packages/shared-types/
+├── dto/               # Data Transfer Objects
+│   ├── aurora/
+│   ├── camera/
+│   ├── launch/
+│   ├── rover/
+│   ├── rover-image/
+│   └── space-telescope-image/
+├── models/            # Shared model types
+│   ├── camera.ts
+│   ├── rover.ts
+│   ├── roverImage.ts
+│   └── spaceTelescopeImage.ts
+└── index.ts           # Main export
+```
+
+## DTO Pattern
+
+DTOs define the shape of API request/response data:
+
+```typescript
+// dto/rover-image/index.ts
+export interface RoverImageDto {
+  id: number;
+  roverId: number;
+  cameraId: number;
+  imgSrc: string;
+  earthDate: string;
+  sol: number;
+}
+
+export interface RoverImagesResponseDto {
+  data: RoverImageDto[];
+  meta: {
+    total: number;
+    page: number;
+    perPage: number;
+    lastPage: number;
+  };
+}
+
+export interface RoverImagesQueryDto {
+  page?: number;
+  limit?: number;
+  rover?: string;
+  camera?: string;
+  earthDate?: string;
+}
+```
+
+## Model Types
+
+Shared model definitions:
+
+```typescript
+// models/rover.ts
+export interface Rover {
+  id: number;
+  name: string;
+  landingDate: string;
+  launchDate: string;
+  status: 'active' | 'complete';
+}
+```
+
+## Usage
+
+### In Frontend
+```typescript
+import type { RoverImageDto, RoverImagesQueryDto } from '@spacr/shared-types';
+
+async function fetchImages(query: RoverImagesQueryDto): Promise<RoverImageDto[]> {
+  // ...
+}
+```
+
+### In Backend
+```typescript
+import type { RoverImageDto } from '@spacr/shared-types';
+
+class RoverImagesController {
+  async getImages(): Promise<RoverImageDto[]> {
+    // ...
+  }
+}
+```
+
+## Best Practices
+
+1. **Keep DTOs flat** - Avoid deep nesting, prefer simple structures
+2. **Use optional for query params** - API query parameters should be optional
+3. **Include pagination meta** - Use consistent pagination response format
+4. **Date strings** - Use ISO 8601 strings for dates in DTOs
+5. **Export from index** - All types should be re-exported from `index.ts`
+
+## Building
+
+The package compiles TypeScript to JavaScript for consumption:
+
+```bash
+cd packages/shared-types
+npm run build
+```
+
+Output includes:
+- `.js` files for runtime
+- `.d.ts` files for TypeScript support
+- `.js.map` source maps
+
+## Adding New Types
+
+1. Create the type file in appropriate directory
+2. Export from the directory's `index.ts`
+3. Re-export from the package's root `index.ts`
+4. Rebuild the package

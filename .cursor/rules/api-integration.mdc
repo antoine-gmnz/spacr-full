@@ -1,0 +1,205 @@
+---
+description: Rules for integrating external space APIs (NASA, ESA, etc.)
+globs: ["apps/backend/app/services/**/*", "apps/backend/app/controllers/**/*"]
+alwaysApply: false
+---
+
+# External API Integration Rules
+
+## Space Data APIs Used
+
+### NASA APIs
+- **APOD** (Astronomy Picture of the Day): `https://api.nasa.gov/planetary/apod`
+- **Mars Rover Photos**: `https://api.nasa.gov/mars-photos/api/v1/rovers`
+- **NASA RSS Feeds**: Various RSS endpoints
+
+### ESA APIs
+- **Hubble/JWST Gallery**: Web scraping via Puppeteer (no public API)
+
+### Other Sources
+- **Space Launch APIs**: Upcoming launches data
+- **Aurora/Kp Index**: NOAA space weather data
+
+## API Key Management
+
+```typescript
+import env from '#start/env'
+
+// Always use environment variables
+const apiKey = env.get('NASA_API_KEY')
+
+// Never hardcode keys
+const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`
+```
+
+## Rate Limiting
+
+NASA APIs have rate limits:
+- **DEMO_KEY**: 30 requests/hour, 50 requests/day
+- **API Key**: 1000 requests/hour
+
+Implement caching to minimize requests:
+
+```typescript
+import Redis from 'ioredis'
+
+async function getApod() {
+  const cacheKey = `apod:${new Date().toISOString().split('T')[0]}`
+  const cached = await redis.get(cacheKey)
+  
+  if (cached) {
+    return JSON.parse(cached)
+  }
+  
+  const data = await fetchFromNasa()
+  await redis.set(cacheKey, JSON.stringify(data), 'EX', 86400) // 24h
+  return data
+}
+```
+
+## Error Handling
+
+External APIs can fail - handle gracefully:
+
+```typescript
+async function fetchExternalData(url: string) {
+  try {
+    const response = await fetch(url)
+    
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded')
+      }
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    // Log for debugging
+    console.error('External API error:', error)
+    
+    // Return cached data if available, or throw
+    const cached = await redis.get(cacheKey)
+    if (cached) return JSON.parse(cached)
+    
+    throw error
+  }
+}
+```
+
+## Web Scraping (ESA)
+
+For ESA images, use Puppeteer:
+
+```typescript
+import puppeteer from 'puppeteer'
+
+async function scrapeESAImages(pageNumber: number) {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  })
+  
+  try {
+    const page = await browser.newPage()
+    
+    // Set reasonable timeout
+    await page.setDefaultTimeout(30000)
+    
+    // Navigate to ESA gallery
+    await page.goto(`https://esahubble.org/images/page/${pageNumber}/`)
+    
+    // Wait for content to load
+    await page.waitForSelector('.image-item')
+    
+    // Extract data
+    const images = await page.evaluate(() => {
+      // ... extraction logic
+    })
+    
+    return images
+  } finally {
+    await browser.close()
+  }
+}
+```
+
+## Data Transformation
+
+Transform external API data to internal DTOs:
+
+```typescript
+interface NasaRoverPhoto {
+  id: number
+  img_src: string
+  earth_date: string
+  sol: number
+  camera: {
+    name: string
+    full_name: string
+  }
+  rover: {
+    name: string
+  }
+}
+
+function transformToDto(photo: NasaRoverPhoto): RoverImageDto {
+  return {
+    id: photo.id,
+    imgSrc: photo.img_src,
+    earthDate: photo.earth_date,
+    sol: photo.sol,
+    cameraName: photo.camera.name,
+    roverName: photo.rover.name,
+  }
+}
+```
+
+## Batch Processing
+
+For initial data ingestion, process in batches:
+
+```typescript
+async function ingestAllRoverImages() {
+  const rovers = ['curiosity', 'opportunity', 'spirit', 'perseverance']
+  
+  for (const rover of rovers) {
+    let page = 1
+    let hasMore = true
+    
+    while (hasMore) {
+      const photos = await fetchRoverPhotos(rover, page)
+      
+      if (photos.length === 0) {
+        hasMore = false
+        continue
+      }
+      
+      // Batch insert
+      await RoverImage.createMany(photos.map(transformToDto))
+      
+      page++
+      
+      // Respect rate limits
+      await sleep(100)
+    }
+  }
+}
+```
+
+## Health Checks
+
+Implement health endpoints for monitoring:
+
+```typescript
+router.get('/health/external-apis', async ({ response }) => {
+  const checks = {
+    nasa: await checkNasaApi(),
+    esa: await checkEsaScraping(),
+  }
+  
+  const allHealthy = Object.values(checks).every(c => c.healthy)
+  
+  return response.status(allHealthy ? 200 : 503).json(checks)
+})
+```

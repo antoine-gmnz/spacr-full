@@ -1,0 +1,274 @@
+---
+description: 3D graphics and visualization rules for React Three Fiber
+globs: ["apps/front/**/*.tsx", "apps/front/**/*.ts"]
+alwaysApply: false
+---
+
+# 3D Graphics & Visualization Rules
+
+## Tech Stack
+
+- **React Three Fiber** - React renderer for Three.js
+- **@react-three/drei** - Useful helpers and abstractions
+- **Three.js** - 3D library
+- **GSAP** - Advanced animations (optional)
+
+## Core Concepts
+
+### Canvas Setup
+```tsx
+import { Canvas } from '@react-three/fiber';
+
+<Canvas
+  camera={{ position: [0, 20, 40], fov: 55 }}
+  className="w-full h-full"
+>
+  <color attach="background" args={['#02030a']} />
+  {/* Scene contents */}
+</Canvas>
+```
+
+### Scene Organization
+```tsx
+import { Suspense } from 'react';
+import { OrbitControls, Stars, Html } from '@react-three/drei';
+
+function Scene() {
+  return (
+    <>
+      {/* Lighting */}
+      <ambientLight intensity={0.3} />
+      <pointLight position={[0, 0, 0]} intensity={2} />
+      
+      <Suspense fallback={null}>
+        {/* 3D Objects */}
+        <Stars radius={200} depth={80} count={8000} fade />
+        
+        {/* Controls */}
+        <OrbitControls enableDamping dampingFactor={0.1} />
+      </Suspense>
+    </>
+  );
+}
+```
+
+## Performance Optimization
+
+### useMemo for Geometry/Materials
+```tsx
+const geometry = useMemo(() => new SphereGeometry(1, 32, 32), []);
+const material = useMemo(() => new MeshStandardMaterial({ color }), [color]);
+```
+
+### useFrame for Animations
+```tsx
+import { useFrame } from '@react-three/fiber';
+
+function RotatingMesh() {
+  const meshRef = useRef<Mesh>(null);
+  
+  useFrame((state, delta) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += delta * 0.5;
+    }
+  });
+  
+  return <mesh ref={meshRef}>{/* ... */}</mesh>;
+}
+```
+
+### Avoid Re-renders
+- Use `useMemo` for computed positions and arrays
+- Use `useCallback` for event handlers
+- Avoid creating new objects in render
+
+## Common Patterns
+
+### Interactive Objects
+```tsx
+function Planet({ position, onClick }) {
+  return (
+    <mesh 
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerOver={() => (document.body.style.cursor = 'pointer')}
+      onPointerOut={() => (document.body.style.cursor = 'default')}
+    >
+      <sphereGeometry args={[1, 32, 32]} />
+      <meshStandardMaterial color="blue" />
+    </mesh>
+  );
+}
+```
+
+### HTML Overlays in 3D
+```tsx
+import { Html } from '@react-three/drei';
+
+<Html 
+  position={[0, 2, 0]} 
+  center 
+  distanceFactor={8}
+  style={{ pointerEvents: 'none' }}
+>
+  <div className="bg-slate-900/90 px-2 py-1 rounded text-xs">
+    Label
+  </div>
+</Html>
+```
+
+### Line Drawing
+```tsx
+import { Line } from '@react-three/drei';
+
+const points = useMemo(() => {
+  // Calculate orbit points
+  return orbitPoints.map(p => [p.x, p.y, p.z]);
+}, []);
+
+<Line 
+  points={points} 
+  color="#3a3f55" 
+  lineWidth={1} 
+  opacity={0.4} 
+  transparent 
+/>
+```
+
+## Space Visualization Specifics
+
+### Coordinate Systems
+```typescript
+// Astronomical Unit to scene units
+const AU_TO_UNITS = 10; // 1 AU = 10 scene units
+
+// Convert position
+const scenePosition = [
+  planet.x * AU_TO_UNITS,
+  planet.y * AU_TO_UNITS,
+  planet.z * AU_TO_UNITS
+] as [number, number, number];
+```
+
+### Scaling Objects
+```typescript
+// Physical radii need heavy scaling to be visible
+const PLANET_SCALE = 500;
+const SUN_SCALE = 60;
+const MIN_RADIUS = 0.12;
+const MAX_RADIUS = 2.0;
+
+function getVisualRadius(body: string, radiusKm: number): number {
+  const radiusAu = radiusKm / 149_597_870.7;
+  const scale = body === 'Sun' ? SUN_SCALE : PLANET_SCALE;
+  const units = radiusAu * AU_TO_UNITS * scale;
+  return Math.min(MAX_RADIUS, Math.max(MIN_RADIUS, units));
+}
+```
+
+### Orbital Mechanics
+```typescript
+// Elliptical orbit calculation
+function calculateOrbitPoints(elements: OrbitalElements, segments = 512) {
+  const { a, e, i, Omega, omega } = elements;
+  const b = a * Math.sqrt(1 - e * e); // Semi-minor axis
+  
+  const points: [number, number, number][] = [];
+  for (let k = 0; k <= segments; k++) {
+    const theta = (k / segments) * Math.PI * 2;
+    const x = a * Math.cos(theta) - a * e;
+    const y = b * Math.sin(theta);
+    // Apply rotation matrices for inclination, etc.
+    points.push(rotateToEquatorial([x, y, 0], i, Omega, omega));
+  }
+  return points;
+}
+```
+
+## Camera Controls
+
+### Dynamic Target
+```tsx
+import { OrbitControls } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
+
+function CameraController({ target }) {
+  const controlsRef = useRef();
+  const { camera } = useThree();
+  
+  useEffect(() => {
+    if (target && controlsRef.current) {
+      controlsRef.current.target.set(...target);
+      controlsRef.current.update();
+    }
+  }, [target]);
+  
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      enableDamping
+      dampingFactor={0.1}
+      autoRotate
+      autoRotateSpeed={0.2}
+      minDistance={5}
+      maxDistance={400}
+    />
+  );
+}
+```
+
+## Lighting for Space
+
+```tsx
+{/* Ambient for base visibility */}
+<ambientLight intensity={0.3} />
+
+{/* Sun as point light at origin */}
+<pointLight position={[0, 0, 0]} intensity={2} color="#ffffff" />
+
+{/* Fill light from above */}
+<pointLight position={[0, 50, 50]} intensity={0.3} color="#ffffff" />
+```
+
+## Materials
+
+### Emissive for Stars
+```tsx
+<meshStandardMaterial 
+  color="#ffd966"
+  emissive="#ff8800"
+  emissiveIntensity={0.8}
+  roughness={0.2}
+  metalness={0.1}
+/>
+```
+
+### Planetary Surfaces
+```tsx
+<meshStandardMaterial 
+  color={planetColor}
+  roughness={0.7}
+  metalness={0.1}
+/>
+```
+
+### Glow Effects
+```tsx
+{/* Outer glow sphere */}
+<mesh>
+  <sphereGeometry args={[radius * 1.2, 32, 32]} />
+  <meshBasicMaterial color="#ffaa00" transparent opacity={0.15} />
+</mesh>
+```
+
+## Debug Tools
+
+```tsx
+import { Stats } from '@react-three/drei';
+
+{/* Show FPS in development */}
+{process.env.NODE_ENV === 'development' && <Stats />}
+```

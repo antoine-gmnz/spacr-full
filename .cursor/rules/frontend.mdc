@@ -1,0 +1,180 @@
+---
+description: Frontend development rules for React + Tailwind + React Router
+globs: ["apps/front/**/*"]
+---
+
+# Frontend Development Rules
+
+## Tech Stack
+
+- **React 19** with functional components and hooks
+- **React Router 7** (file-based routing in `app/routes/`)
+- **Tailwind CSS 4** with CSS variables for theming
+- **TanStack Query** for server state management
+- **Radix UI** for accessible primitives
+- **Motion** (Framer Motion) for animations
+- **React Three Fiber** for 3D visualizations
+
+## Project Structure
+
+```
+apps/front/app/
+├── api/           # API client functions (fetch wrappers)
+├── components/    # React components organized by feature
+│   ├── ui/        # Reusable UI primitives (shadcn/ui style)
+│   └── [feature]/ # Feature-specific components
+├── context/       # React contexts
+├── hooks/         # Custom React hooks
+├── lib/           # Utilities (http client, utils)
+├── providers/     # Provider components
+├── routes/        # React Router route components
+└── types/         # TypeScript type definitions
+```
+
+## Component Guidelines
+
+### Component Structure
+```tsx
+import { useState, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/utils';
+
+interface MyComponentProps {
+  title: string;
+  onAction?: () => void;
+}
+
+export function MyComponent({ title, onAction }: MyComponentProps) {
+  // Hooks first
+  const [state, setState] = useState(false);
+  
+  // Derived values with useMemo
+  const computed = useMemo(() => /* ... */, [deps]);
+  
+  // Callbacks with useCallback
+  const handleClick = useCallback(() => {
+    onAction?.();
+  }, [onAction]);
+  
+  // Render
+  return (
+    <div className="...">
+      {title}
+    </div>
+  );
+}
+```
+
+### UI Components
+
+UI primitives live in `components/ui/` and follow shadcn/ui patterns:
+- Use `class-variance-authority` (cva) for variants
+- Use `cn()` utility for class merging
+- Support `asChild` pattern via Radix Slot when needed
+- Include proper TypeScript props with `ComponentProps`
+
+Example pattern:
+```tsx
+const variants = cva("base-classes", {
+  variants: {
+    variant: {
+      default: "default-classes",
+      secondary: "secondary-classes",
+    },
+    size: {
+      default: "size-default",
+      sm: "size-sm",
+      lg: "size-lg",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
+```
+
+## TanStack Query Usage
+
+### Query Pattern
+```tsx
+import { useQuery } from '@tanstack/react-query';
+import { fetchRoverImages } from '@/api/rover';
+
+export function useRoverImages(params: RoverParams) {
+  return useQuery({
+    queryKey: ['rover-images', params],
+    queryFn: () => fetchRoverImages(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+```
+
+### API Client Pattern
+```tsx
+// api/rover.ts
+import { httpClient } from '@/lib/http';
+
+export async function fetchRoverImages(params: RoverParams) {
+  const response = await httpClient.get('/api/v1/rover-image', { params });
+  return response.data;
+}
+```
+
+## Styling with Tailwind
+
+### Design Tokens
+- Use CSS variables for colors: `bg-primary`, `text-foreground`
+- Dark mode support via `.dark` class
+- Responsive design: `sm:`, `md:`, `lg:`, `xl:` breakpoints
+
+### Common Patterns
+```tsx
+// Conditional classes with cn()
+<div className={cn(
+  "base-classes",
+  isActive && "active-classes",
+  className
+)} />
+
+// Space-themed dark backgrounds
+<div className="bg-[#02030a]" /> // Deep space black
+<div className="bg-slate-900/95" /> // Semi-transparent dark
+```
+
+### Animation
+- Use `motion` library for complex animations
+- CSS transitions for simple hover effects
+- GSAP available for advanced timeline animations
+
+## Form Handling
+
+Use TanStack Form for complex forms:
+```tsx
+import { useForm } from '@tanstack/react-form';
+
+const form = useForm({
+  defaultValues: { /* ... */ },
+  onSubmit: async ({ value }) => { /* ... */ },
+});
+```
+
+## Performance
+
+- Use `useMemo` for expensive computations
+- Use `useCallback` for callbacks passed to children
+- Lazy load heavy components with `React.lazy()`
+- Use `Suspense` boundaries for loading states
+- Implement proper loading skeletons
+
+## Error Handling
+
+- Use error boundaries for component errors
+- Show toast notifications for API errors with `react-hot-toast`
+- Provide fallback UI for failed data fetching
+
+## Accessibility
+
+- Use semantic HTML elements
+- Include proper ARIA attributes via Radix primitives
+- Support keyboard navigation
+- Maintain good color contrast ratios

@@ -1,0 +1,67 @@
+# Spacr Project - Cursor AI Rules
+
+You are working on **Spacr**, a space exploration application that provides beautiful visualizations and data about space missions, rovers, telescopes, and astronomical phenomena.
+
+## Quick Reference
+
+### Tech Stack
+- **Monorepo**: Turbo with npm workspaces
+- **Backend**: AdonisJS 6 + PostgreSQL + Redis
+- **Frontend**: React 19 + React Router 7 + Tailwind CSS 4 + React Three Fiber
+- **Shared**: TypeScript types in `@spacr/shared-types`
+
+### Key Directories
+- `apps/backend/` - AdonisJS API server
+- `apps/front/` - React frontend with 3D visualizations
+- `packages/shared-types/` - Shared TypeScript types
+
+### Development
+```bash
+npm run dev      # Start all apps
+npm run build    # Build all apps
+npm run lint     # Lint all apps
+```
+
+## Core Principles
+
+1. **Type Safety** - Use TypeScript strictly, leverage shared types
+2. **Performance** - Optimize 3D scenes, cache API responses
+3. **Space Theme** - Deep dark backgrounds (#02030a), cosmic aesthetics
+4. **Responsive** - Mobile-first, works on all screen sizes
+5. **Accessible** - Use Radix UI primitives, proper ARIA
+
+## When Working on This Project
+
+### Frontend Tasks
+- Check existing components in `apps/front/app/components/ui/` before creating new ones
+- Use TanStack Query for server state
+- Follow the cva pattern for component variants
+- Animations with Motion library
+
+### Backend Tasks
+- Controllers should be thin, delegate to services
+- Use VineJS validators for request validation
+- Cache external API responses in Redis
+- Use lazy imports for controllers in routes
+
+### 3D Graphics Tasks
+- Use React Three Fiber patterns
+- Optimize with useMemo and useCallback
+- Follow AU_TO_UNITS scaling conventions
+- Use proper lighting for space scenes
+
+### API Integration
+- Always use environment variables for API keys
+- Implement caching for external API calls
+- Handle rate limits gracefully
+- Transform external data to internal DTOs
+
+## File Naming
+- kebab-case for files: `rover-images.controller.ts`
+- PascalCase for React components: `SpaceScene.tsx`
+- Lowercase for directories: `components/spaceExplorer/`
+
+## Import Aliases
+- Frontend: `@/` maps to `app/`
+- Backend: `#` maps to internal directories (`#services/*`, `#models/*`, etc.)
+

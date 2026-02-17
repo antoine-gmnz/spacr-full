@@ -21,6 +21,7 @@ const ESASpaceTelescopeImageController = () =>
 const LaunchesController = () => import('#controllers/launches.controller')
 const AuroraController = () => import('#controllers/aurora.controller')
 const SpaceExplorerController = () => import('#controllers/space-explorer.controller')
+const ISSController = () => import('#controllers/iss.controller')
 
 // Optimized API routes
 router
@@ -65,6 +66,11 @@ router
     // Aurora endpoints
     router.get('/aurora', [AuroraController, 'getAuroraData'])
     router.get('/aurora/visibility', [AuroraController, 'getVisibility'])
+
+    // ISS endpoints
+    router.get('/iss/position', [ISSController, 'getPosition'])
+    router.get('/iss/crew', [ISSController, 'getCrew'])
+    router.get('/iss/passes', [ISSController, 'getPasses'])
 
     // Space Explorer endpoints
     router.get('/space-explorer/positions', [SpaceExplorerController, 'getPositions'])

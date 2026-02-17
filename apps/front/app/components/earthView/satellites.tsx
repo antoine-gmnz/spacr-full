@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import type { SatelliteVectorData } from 'src/components/earthView/type';
-import { getBaseDataFor3DView } from 'src/components/earthView/utils/calculateSatellitePos';
-import { Satellite } from 'src/components/earthView/submodules/satellite';
-import { Member } from 'src/shared-types/src/NASA';
+import type { SatelliteVectorData } from '@/components/earthView/type';
+import { getBaseDataFor3DView } from '@/components/earthView/utils/calculateSatellitePos';
+import { Satellite } from '@/components/earthView/submodules/satellite';
+import type { TleMember } from '@/types/tle';
 
 interface PropsSatellites {
-  satelliteMemberList: Member[];
+  satelliteMemberList: TleMember[];
   controlsRef: React.RefObject<any>;
 }
 

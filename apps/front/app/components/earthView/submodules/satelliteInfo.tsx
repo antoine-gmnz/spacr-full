@@ -1,5 +1,5 @@
-import { useSelectedSatellite } from 'src/context/satelliteContext';
-import React from 'react';
+import { useSelectedSatellite } from '@/context/satelliteContext';
+import { type JSX } from 'react';
 
 export function SatelliteInfo(): JSX.Element | null {
   const { selectedSatellite } = useSelectedSatellite();

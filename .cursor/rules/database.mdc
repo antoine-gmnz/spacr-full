@@ -1,0 +1,283 @@
+---
+description: Database and ORM rules for PostgreSQL with Lucid ORM
+globs: ["apps/backend/app/models/**/*", "apps/backend/database/**/*"]
+alwaysApply: false
+---
+
+# Database & ORM Rules
+
+## PostgreSQL with Lucid ORM
+
+Spacr uses PostgreSQL with AdonisJS Lucid ORM for:
+- **Rover Images** - Cached NASA Mars rover photos
+- **Space Telescope Images** - Scraped ESA Hubble/JWST images
+- **Rovers & Cameras** - Reference data
+- **Constellations** - Astronomical reference data
+
+## Database Schema
+
+Key tables:
+- `rovers` - Mars rover reference data
+- `cameras` - Rover camera reference data
+- `rover_images` - Cached rover photos
+- `space_telescope_images` - ESA images
+- `space_telescopes` - Telescope reference (Hubble, JWST)
+- `constellations` - Star constellation data
+
+## Migration Patterns
+
+### Creating Tables
+
+```typescript
+import { BaseSchema } from '@adonisjs/lucid/schema'
+
+export default class extends BaseSchema {
+  protected tableName = 'rover_images'
+
+  async up() {
+    this.schema.createTable(this.tableName, (table) => {
+      table.increments('id')
+      
+      // Foreign keys
+      table.integer('rover_id').unsigned().references('rovers.id').onDelete('CASCADE')
+      table.integer('camera_id').unsigned().references('cameras.id')
+      
+      // Data columns
+      table.string('img_src', 500).notNullable()
+      table.date('earth_date').notNullable()
+      table.integer('sol').notNullable()
+      
+      // Text fields for descriptions
+      table.text('description')
+      
+      // Timestamps
+      table.timestamp('created_at').defaultTo(this.now())
+      table.timestamp('updated_at').defaultTo(this.now())
+      
+      // Indexes for common queries
+      table.index(['rover_id', 'earth_date'])
+      table.index(['sol'])
+    })
+  }
+
+  async down() {
+    this.schema.dropTable(this.tableName)
+  }
+}
+```
+
+### Altering Tables
+
+```typescript
+export default class extends BaseSchema {
+  protected tableName = 'rover_images'
+
+  async up() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.text('full_description').alter() // Change column type
+      table.string('new_field').nullable()   // Add new column
+    })
+  }
+
+  async down() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.string('full_description', 255).alter()
+      table.dropColumn('new_field')
+    })
+  }
+}
+```
+
+## Model Patterns
+
+### Basic Model
+
+```typescript
+import { DateTime } from 'luxon'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+
+export default class Rover extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare name: string
+
+  @column()
+  declare status: 'active' | 'complete'
+
+  @column.date()
+  declare landingDate: DateTime
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+```
+
+### Relationships
+
+```typescript
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Rover from './rover.js'
+import Camera from './camera.js'
+
+export default class RoverImage extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare roverId: number
+
+  @column()
+  declare cameraId: number
+
+  @belongsTo(() => Rover)
+  declare rover: BelongsTo<typeof Rover>
+
+  @belongsTo(() => Camera)
+  declare camera: BelongsTo<typeof Camera>
+}
+
+// In Rover model
+export default class Rover extends BaseModel {
+  @hasMany(() => RoverImage)
+  declare images: HasMany<typeof RoverImage>
+
+  @hasMany(() => Camera)
+  declare cameras: HasMany<typeof Camera>
+}
+```
+
+## Query Patterns
+
+### Basic Queries
+
+```typescript
+// Find by ID
+const rover = await Rover.find(1)
+
+// Find or fail
+const rover = await Rover.findOrFail(1)
+
+// First matching
+const image = await RoverImage.query()
+  .where('roverId', roverId)
+  .first()
+```
+
+### With Relationships
+
+```typescript
+// Eager load
+const images = await RoverImage.query()
+  .preload('rover')
+  .preload('camera')
+  .paginate(page, perPage)
+
+// Nested preloads
+const rover = await Rover.query()
+  .preload('cameras')
+  .preload('images', (query) => {
+    query.orderBy('earthDate', 'desc').limit(10)
+  })
+  .firstOrFail()
+```
+
+### Filtering & Pagination
+
+```typescript
+async getImages(params: QueryParams) {
+  const query = RoverImage.query()
+    .preload('rover')
+    .preload('camera')
+  
+  // Apply filters
+  if (params.rover) {
+    query.whereHas('rover', (q) => q.where('name', params.rover))
+  }
+  
+  if (params.camera) {
+    query.whereHas('camera', (q) => q.where('name', params.camera))
+  }
+  
+  if (params.earthDate) {
+    query.where('earthDate', params.earthDate)
+  }
+  
+  // Full-text search
+  if (params.search) {
+    query.whereILike('description', `%${params.search}%`)
+  }
+  
+  // Sorting
+  query.orderBy(params.sortBy || 'earthDate', params.sortOrder || 'desc')
+  
+  // Paginate
+  return query.paginate(params.page || 1, params.limit || 25)
+}
+```
+
+### Bulk Operations
+
+```typescript
+// Insert many
+await RoverImage.createMany([
+  { imgSrc: '...', roverId: 1, sol: 100 },
+  { imgSrc: '...', roverId: 1, sol: 101 },
+])
+
+// Update many
+await RoverImage.query()
+  .where('roverId', roverId)
+  .update({ processed: true })
+
+// Upsert (insert or update)
+await RoverImage.updateOrCreate(
+  { externalId: photo.id },  // Search criteria
+  { imgSrc: photo.img_src }  // Update/insert data
+)
+```
+
+## Seeding
+
+```typescript
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import Rover from '#models/rover'
+
+export default class extends BaseSeeder {
+  async run() {
+    await Rover.createMany([
+      { name: 'Curiosity', status: 'active', landingDate: DateTime.fromISO('2012-08-06') },
+      { name: 'Perseverance', status: 'active', landingDate: DateTime.fromISO('2021-02-18') },
+      { name: 'Opportunity', status: 'complete', landingDate: DateTime.fromISO('2004-01-25') },
+      { name: 'Spirit', status: 'complete', landingDate: DateTime.fromISO('2004-01-04') },
+    ])
+  }
+}
+```
+
+## Performance Tips
+
+1. **Use indexes** for frequently queried columns
+2. **Paginate** large result sets
+3. **Select specific columns** when full model not needed
+4. **Use raw queries** for complex aggregations
+5. **Batch inserts** for bulk data ingestion
+
+```typescript
+// Select specific columns
+const images = await RoverImage.query()
+  .select('id', 'imgSrc', 'earthDate')
+  .where('roverId', 1)
+
+// Raw query for aggregations
+const stats = await Database.rawQuery(`
+  SELECT rover_id, COUNT(*) as count, MAX(earth_date) as latest
+  FROM rover_images
+  GROUP BY rover_id
+`)
+```

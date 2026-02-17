@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 import * as satelliteJs from 'satellite.js';
-import type { SatelliteVectorData } from 'src/components/earthView/type';
-import { Member } from 'src/shared-types/src/NASA';
+import type { SatelliteVectorData } from '@/components/earthView/type';
+import type { TleMember } from '@/types/tle';
 
 export const getSatRecFromMember = (line1: string, line2: string): satelliteJs.SatRec => {
   const tle = [line1, line2];
@@ -43,7 +43,7 @@ export const checkPositionECI = (positionEci: satelliteJs.EciVec3<number> | bool
   return false;
 };
 
-export const getBaseDataFor3DView = (satelliteData: Member[]): (SatelliteVectorData | undefined)[] => {
+export const getBaseDataFor3DView = (satelliteData: TleMember[]): (SatelliteVectorData | undefined)[] => {
   return satelliteData
     .map(satellite => {
       const satrec = getSatRecFromMember(satellite.line1, satellite.line2);
@@ -55,7 +55,7 @@ export const getBaseDataFor3DView = (satelliteData: Member[]): (SatelliteVectorD
         return {
           position: new Vector3(x, y, z),
           name: satellite.name,
-          date: satellite.date,
+          date: new Date().toISOString(), // Use current date since TleMember doesn't have date
           id: satellite.satelliteId,
           satrec: satrec,
         } as unknown as SatelliteVectorData;

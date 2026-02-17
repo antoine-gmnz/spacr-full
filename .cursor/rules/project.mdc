@@ -1,0 +1,101 @@
+---
+description: Main project rules for Spacr - a space exploration application
+globs: ["**/*"]
+---
+
+# Spacr Project Rules
+
+## Project Overview
+
+Spacr is a **monorepo space exploration application** built with:
+- **Turbo** for monorepo management
+- **Backend**: AdonisJS 6 (TypeScript) with Lucid ORM, PostgreSQL, Redis
+- **Frontend**: React 19 + React Router 7 + Tailwind CSS 4 + React Three Fiber
+- **Shared packages**: TypeScript shared types in `packages/shared-types`
+
+## Architecture
+
+```
+spacr-full/
+├── apps/
+│   ├── backend/         # AdonisJS API server
+│   └── front/           # React frontend with 3D visualizations
+├── packages/
+│   └── shared-types/    # Shared TypeScript types & DTOs
+├── turbo.json           # Turbo configuration
+└── docker-compose.yaml  # Docker services (PostgreSQL, Redis)
+```
+
+## Core Features
+
+The application provides space-related data including:
+- **Mars Rover Images** (NASA API + database caching)
+- **Space Telescope Gallery** (ESA Hubble/JWST images via scraping)
+- **Aurora Tracking** (Kp index, visibility maps)
+- **Space Launches** (upcoming launches, countdown timers)
+- **APOD** (NASA Astronomy Picture of the Day)
+- **3D Solar System Explorer** (interactive Three.js visualization)
+- **Satellite Tracking** (TLE data, Earth visualization)
+
+## Development Commands
+
+```bash
+# Root commands (uses Turbo)
+npm run dev        # Start all apps in development mode
+npm run build      # Build all apps
+npm run lint       # Lint all apps
+npm run format     # Format with Prettier
+
+# Backend specific (from apps/backend/)
+node ace serve --hmr    # Start with HMR
+node ace build          # Build for production
+node ace migration:run  # Run database migrations
+
+# Frontend specific (from apps/front/)
+npm run dev        # Start Vite dev server
+npm run build      # Build for production
+```
+
+## Coding Conventions
+
+### TypeScript
+- Strict TypeScript everywhere
+- Use shared types from `@spacr/shared-types` for API contracts
+- Prefer `type` over `interface` for simple type definitions
+- Use proper typing, avoid `any` unless absolutely necessary
+
+### File Naming
+- Use kebab-case for file names: `rover-images.controller.ts`
+- Use PascalCase for React components: `SpaceScene.tsx`
+- Use camelCase for utility functions and hooks
+
+### Imports
+- Use path aliases: `@/` for frontend, `#` for backend
+- Group imports: external packages first, then internal modules
+- Use lazy imports for controllers in routes
+
+### Code Style
+- 2 spaces for indentation
+- Single quotes for strings
+- No semicolons omission (keep semicolons)
+- Use Prettier for formatting
+
+## API Design
+
+- All API routes are prefixed with `/api/v1`
+- Use RESTful conventions
+- Controllers handle HTTP, Services handle business logic
+- Use VineJS validators for request validation
+
+## Environment Variables
+
+Backend requires:
+- `NASA_API_KEY` - NASA API key for APOD and rover data
+- `DATABASE_URL` - PostgreSQL connection string
+- `REDIS_URL` - Redis connection for caching/jobs
+
+## Git Conventions
+
+- Use conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
+- Keep commits focused and atomic
+- Reference issues in commit messages when applicable
