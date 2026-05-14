@@ -34,7 +34,6 @@
     "#dto/*": "./app/dto/*.js"
   },
   "devDependencies": {
-    "@spacr/shared-types": "*",
     "@adonisjs/assembler": "^7.8.2",
     "@adonisjs/eslint-config": "^2.0.0",
     "@adonisjs/prettier-config": "^1.4.4",
@@ -43,6 +42,7 @@
     "@japa/assert": "^4.0.1",
     "@japa/plugin-adonisjs": "^4.0.0",
     "@japa/runner": "^4.2.0",
+    "@spacr/shared-types": "*",
     "@swc/core": "1.11.24",
     "@types/luxon": "^3.6.2",
     "@types/node": "^22.15.18",
@@ -58,6 +58,8 @@
     "@adonisjs/core": "^6.18.0",
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^21.8.0",
+    "@adonisjs/mail": "^10.2.0",
+    "@adonisjs/session": "^7.7.1",
     "@vinejs/vine": "^3.0.1",
     "adonisjs-jobs": "^0.0.26",
     "astronomy-engine": "file:.yalc/astronomy-engine",

@@ -55,4 +55,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   NASA_API_KEY: Env.schema.string(),
   SPACE_DEVS_API_URL: Env.schema.string(),
+
+  APP_URL: Env.schema.string.optional(),
+
+  SMTP_HOST: Env.schema.string.optional(),
+  SMTP_PORT: Env.schema.number.optional(),
+  SMTP_USER: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.string.optional(),
+  MAIL_FROM: Env.schema.string.optional(),
 })

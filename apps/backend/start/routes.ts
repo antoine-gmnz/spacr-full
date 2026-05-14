@@ -8,6 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
 
 const RoverImagesController = () => import('#controllers/rover-images.controller')
 const SpaceTelescopeImagesController = () =>
@@ -22,6 +23,10 @@ const LaunchesController = () => import('#controllers/launches.controller')
 const AuroraController = () => import('#controllers/aurora.controller')
 const SpaceExplorerController = () => import('#controllers/space-explorer.controller')
 const ISSController = () => import('#controllers/iss.controller')
+const PasswordResetController = () => import('#controllers/password_reset.controller')
+const AuthController = () => import('#controllers/auth.controller')
+const UserLocationsController = () => import('#controllers/user_locations.controller')
+const UserProfileController = () => import('#controllers/user_profile.controller')
 
 // Optimized API routes
 router
@@ -75,5 +80,24 @@ router
     // Space Explorer endpoints
     router.get('/space-explorer/positions', [SpaceExplorerController, 'getPositions'])
     router.get('/space-explorer/body/:name', [SpaceExplorerController, 'getBody'])
+
+    // Auth endpoints
+    router.group(() => {
+      router.post('/register', [AuthController, 'register'])
+      router.post('/login', [AuthController, 'login'])
+      router.post('/logout', [AuthController, 'logout']).use(middleware.auth())
+      router.get('/me', [AuthController, 'me']).use(middleware.auth())
+      router.post('/forgot-password', [PasswordResetController, 'forgotPassword'])
+      router.post('/reset-password', [PasswordResetController, 'resetPassword'])
+    }).prefix('/auth')
+
+    // User endpoints (all require auth)
+    router.group(() => {
+      router.get('/locations', [UserLocationsController, 'list'])
+      router.post('/locations', [UserLocationsController, 'create'])
+      router.patch('/locations/:id', [UserLocationsController, 'update'])
+      router.delete('/locations/:id', [UserLocationsController, 'destroy'])
+      router.patch('/profile', [UserProfileController, 'update'])
+    }).prefix('/user').use(middleware.auth())
   })
   .prefix('/api/v1')

@@ -26,7 +26,7 @@ export default defineConfig({
   |
   */
   commands: [
-    () => import('@adonisjs/core/commands'), 
+    () => import('@adonisjs/core/commands'),
     () => import('@adonisjs/lucid/commands')
   ],
 
@@ -48,7 +48,9 @@ export default defineConfig({
     },
     () => import('@adonisjs/core/providers/vinejs_provider'),
     () => import('@adonisjs/cors/cors_provider'),
-    () => import('@adonisjs/lucid/database_provider')
+    () => import('@adonisjs/lucid/database_provider'),
+    () => import('@adonisjs/auth/auth_provider'),
+    () => import('@adonisjs/session/session_provider'),
   ],
 
   /*
