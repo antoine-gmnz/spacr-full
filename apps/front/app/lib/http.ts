@@ -68,6 +68,7 @@ export class HttpClient {
       headers: mergedHeaders,
       body,
       signal: composite.signal,
+      credentials: 'include',
       ...rest,
     });
 

@@ -5,6 +5,8 @@ import './app.css';
 import { TanstackQueryProvider } from './providers/query-provider';
 import RootLayout from '@/components/layout';
 import { ThemeProvider } from '@/context/themeContext';
+import { AuthProvider } from '@/context/authContext';
+import { PrimaryLocationProvider } from '@/context/primaryLocationContext';
 import { Toaster } from 'react-hot-toast';
 
 export const links: Route.LinksFunction = () => [
@@ -44,7 +46,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <TanstackQueryProvider>
-      <Outlet />
+      <AuthProvider>
+        <PrimaryLocationProvider>
+          <Outlet />
+        </PrimaryLocationProvider>
+      </AuthProvider>
     </TanstackQueryProvider>
   );
 }

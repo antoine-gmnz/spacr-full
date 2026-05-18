@@ -4,6 +4,8 @@ export type { GetCamerasResponseDTO } from './camera';
 export type { GetSpaceTelescopeImagesResponseDTO } from './space-telescope-image';
 export type { LaunchData, LaunchDataResponse } from './launch';
 export type { AuroraPoint, AuroraData, AuroraVisibility, AuroraVisibilityRequest } from './aurora';
+export type { UserDto, RegisterRequest, LoginRequest, AuthResponse, UpdateProfileRequest } from './auth';
+export type { UserLocationDto, CreateUserLocationRequest, UpdateUserLocationRequest } from './user';
 
 export type PaginatedData = {
   total: number;

@@ -1,12 +1,28 @@
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, Link } from '@radix-ui/react-navigation-menu';
-import { EarthIcon, Globe, HomeIcon, MoonIcon, OrbitIcon, RocketIcon, SatelliteIcon, Sparkles, SunIcon } from 'lucide-react';
+import {
+  EarthIcon,
+  Globe,
+  HomeIcon,
+  MoonIcon,
+  OrbitIcon,
+  RocketIcon,
+  SatelliteIcon,
+  Sparkles,
+  SunIcon,
+  UserIcon,
+  SettingsIcon,
+  LogOutIcon,
+  LogInIcon,
+} from 'lucide-react';
 
 import LogoH from '@/assets/logo-hor.svg';
 import LogoW from '@/assets/logo-white.svg';
 import { type JSX } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/context/themeContext';
+import { useAuth } from '@/context/authContext';
+import { useNavigate } from 'react-router';
 
 const items = [
   { label: 'Home', href: '/', icon: <HomeIcon size={17} /> },
@@ -20,6 +36,13 @@ const items = [
 
 export function Navigation(): JSX.Element {
   const { toggleTheme, theme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate('/');
+  }
 
   return (
     <NavigationMenu className="flex justify-between">
@@ -40,10 +63,45 @@ export function Navigation(): JSX.Element {
           ))}
         </NavigationMenuList>
       </div>
-      <div className="flex items-center justify-center h-16">
+      <div className="flex items-center justify-center h-16 gap-1">
         <Button onClick={toggleTheme} variant="ghost" className="h-12 w-12 hover:cursor-pointer" asChild>
           {theme === 'light' ? <MoonIcon className="h-10 w-10" /> : <SunIcon className="h-10 w-10" />}
         </Button>
+        {isAuthenticated ? (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/settings/profile')}
+              className="gap-1 text-sm"
+              title={user?.displayName ?? user?.email}
+            >
+              <UserIcon size={16} />
+              <span className="max-w-[120px] truncate">{user?.displayName ?? user?.email}</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/settings/locations')}
+              title="Settings"
+            >
+              <SettingsIcon size={16} />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleLogout} title="Sign out">
+              <LogOutIcon size={16} />
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="gap-1">
+              <LogInIcon size={16} />
+              Sign in
+            </Button>
+            <Button size="sm" onClick={() => navigate('/register')}>
+              Register
+            </Button>
+          </>
+        )}
       </div>
     </NavigationMenu>
   );
